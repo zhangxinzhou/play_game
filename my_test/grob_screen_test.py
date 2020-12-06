@@ -36,7 +36,7 @@ hwnd = win32gui.FindWindow(None, game_title)
 if hwnd == 0:
     print('can not find [{}]'.format(game_title))
     print('exit')
-    # exit()
+    exit()
 app = QApplication(sys.argv)
 screen = app.primaryScreen()
 while True:
