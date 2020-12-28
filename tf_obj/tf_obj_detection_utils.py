@@ -1,8 +1,6 @@
 import numpy as np
 import time
 import cv2
-from six import BytesIO
-from PIL import Image
 import tensorflow as tf
 from object_detection.utils import visualization_utils as viz_utils
 
@@ -14,29 +12,6 @@ from object_detection.utils import visualization_utils as viz_utils
 2.下载模型,并将模型解压到models文件夹下
 3.运行本文件main方法
 '''
-
-
-# 先把模型下载好,放到models文件夹下面
-
-def load_image_into_numpy_array(path):
-    """Load an image from file into a numpy array.
-
-    Puts image into numpy array to feed into tensorflow graph.
-    Note that by convention we put it into a numpy array with shape
-    (height, width, channels), where channels=3 for RGB.
-
-    Args:
-      path: a file path (this can be local or on colossus)
-
-    Returns:
-      uint8 numpy array with shape (img_height, img_width, 3)
-    """
-    img_data = tf.io.gfile.GFile(path, 'rb').read()
-    image = Image.open(BytesIO(img_data))
-    (im_width, im_height) = image.size
-    return np.array(image.getdata()).reshape(
-        (im_height, im_width, 3)).astype(np.uint8)
-
 
 # Load the COCO Label Map
 category_index = {
