@@ -126,7 +126,7 @@ if __name__ == '__main__':
     time0 = time.time()
     img_mat1 = get_object_detection_img(img_mat0)
     time1 = time.time()
-    print("cost : {}".format(1000 * (time1 - time0)))
+    print("cost : {} ms".format(1000 * (time1 - time0)))
     cv2.imshow('window0', img_mat0)
     cv2.imshow('window1', img_mat1)
     cv2.waitKey(0)
