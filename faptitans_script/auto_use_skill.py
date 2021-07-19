@@ -18,7 +18,7 @@ xy_close_rank_change = (-706, 211)
 
 
 def skill_click(xy):
-    pyautogui.moveTo(xy[0], xy[1], duration=0.2)
+    pyautogui.moveTo(xy[0], xy[1])
     pyautogui.click()
 
 
@@ -77,8 +77,6 @@ if __name__ == '__main__':
     job_auto_use_skill_all()
 
     scheduler = BlockingScheduler()
-    scheduler.add_job(job_auto_use_skill_all, 'cron', minute='0/20')
-    scheduler.add_job(job_auto_use_skill1, 'cron', minute='3, 6, 9, 12, 15, 24, 27, 30, 33, 36, 45, 48, 51, 54')
+    scheduler.add_job(job_auto_use_skill_all, 'interval', minutes=12)
+    scheduler.add_job(job_auto_use_skill1, 'interval', minutes=2)
     scheduler.start()
-
-
