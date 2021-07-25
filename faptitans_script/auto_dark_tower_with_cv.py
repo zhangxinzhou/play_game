@@ -64,6 +64,7 @@ def get_img():
 
 
 # 关闭弹窗
+# TODO 待实现
 def find_close_button_position():
     # 通过open_cv找到弹窗关闭按钮的位置
     pop_xy = (0, 0)
@@ -103,49 +104,16 @@ def handle_shade_cover():
     exit(-1)
 
 
-# 处理技能
-def handle_skill():
-    img = get_img()
-    skill01_ok = script_utils.img_position_match_color(img, skill01_xy, skill_ok_color)
-    skill04_ok = script_utils.img_position_match_color(img, skill04_xy, skill_ok_color)
-    skill_xy_list = []
-    if skill01_ok and not skill04_ok:
-        # 点技能1
-        skill_xy_list = [skill01_xy]
-    elif skill01_ok and skill04_ok:
-        # 点技能2,3,4,5,6,7,1
-        skill_xy_list = [boss_xy, skill02_xy, skill03_xy, skill04_xy, skill05_xy, skill06_xy, skill07_xy, skill01_xy]
-
-    # 执行操作
-    for skill_xy in skill_xy_list:
-        click_xy = get_click_xy(skill_xy)
-        click_xy = (click_xy[0] + 10, click_xy[1] + 10)
-        pyautogui.click(click_xy, duration=0.1)
-
-
-# 处理英雄
-# TODO 待处理技能升级
-def handle_hero():
-    # N次
-    for i in range(10):
-        img = get_img()
-        for hero_xy in hero_list:
-            # 依次判断四个英雄是否可以购买或者升级
-            if script_utils.img_position_match_color(img, hero_xy, hero_ok_color):
-                click_xy = get_click_xy(hero_xy)
-                pyautogui.click(click_xy)
-                time.sleep(1.2)
-                break
-
-
-# 升级英雄
-def handle_game():
+# 爬塔
+def handle_dark_tower():
     # 如果有遮罩层,先处理遮罩层
     # handle_shade_cover()
-    # 使用技能
-    handle_skill()
-    # 英雄升级
-    handle_hero()
+
+    pass
+
+
+def handle_game():
+    pass
 
 
 if __name__ == '__main__':
