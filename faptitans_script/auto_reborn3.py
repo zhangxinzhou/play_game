@@ -133,12 +133,11 @@ def handle_skill():
 
 # 升级英雄
 def hero_level_up1():
-    # 依次判断四个英雄是否可以购买或者升级
-    max_times = 10
-    while max_times > 0:
-        max_times -= 1
+    # N次
+    for i in range(10):
         img = get_img()
         for hero_xy in hero_list:
+            # 依次判断四个英雄是否可以购买或者升级
             if img_position_match_color(img, hero_xy, hero_ok_color):
                 click_xy = get_click_xy(hero_xy)
                 pyautogui.click(click_xy)
