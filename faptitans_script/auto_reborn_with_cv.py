@@ -80,7 +80,7 @@ def find_close_button_position():
 # 处理遮罩层
 def handle_shade_cover():
     # 尝试次数
-    try_times = 5
+    try_times = 10
     for i in try_times:
         img = get_img()
         is_cover = img_position_match_color(img, shade_cover_xy, shade_cover_color)
@@ -95,7 +95,6 @@ def handle_shade_cover():
     pyautogui.press("f5")
     time.sleep(10)
     # 再来关闭一遍弹窗
-    try_times = 5
     for i in try_times:
         img = get_img()
         is_cover = img_position_match_color(img, shade_cover_xy, shade_cover_color)
