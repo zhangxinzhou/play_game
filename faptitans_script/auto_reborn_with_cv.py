@@ -111,7 +111,7 @@ def handle_shade_cover():
     exit(-1)
 
 
-# 使用技能
+# 处理技能
 def handle_skill():
     img = get_img()
     skill01_ok = img_position_match_color(img, skill01_xy, skill_ok_color)
@@ -131,8 +131,9 @@ def handle_skill():
         pyautogui.click(click_xy, duration=0.1)
 
 
-# 升级英雄
-def hero_level_up1():
+# 处理英雄
+# TODO 待处理技能升级
+def handle_hero():
     # N次
     for i in range(10):
         img = get_img()
@@ -146,18 +147,17 @@ def hero_level_up1():
 
 
 # 升级英雄
-def play_game():
+def handle_game():
     # 如果有遮罩层,先处理遮罩层
     # handle_shade_cover()
     # 使用技能
     handle_skill()
     # 英雄升级
-    hero_level_up1()
+    handle_hero()
 
 
 if __name__ == '__main__':
-    pyautogui.screenshot('screen.png', img_region)
     while True:
-        play_game()
+        handle_game()
         print(datetime.datetime.now())
         time.sleep(10)
