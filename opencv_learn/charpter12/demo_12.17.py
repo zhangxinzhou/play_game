@@ -1,0 +1,22 @@
+import cv2
+
+o = cv2.imread("cc.bmp")
+cv2.imshow("original", o)
+gray = cv2.cvtColor(o, cv2.COLOR_BGR2GRAY)
+ret, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+contours, hierarchy = cv2.findContours(binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+rows, cols = gray.shape[:2]
+[vx, vy, x, y] = cv2.fitLine(contours[0], cv2.DIST_L2, 0, 0.01, 0.01)
+lefty = int((-x * vy / vx) + y)
+righty = int(((cols - x) * vy / vx) + y)
+print("=================")
+p1 = (cols - 1, righty)
+p2 = (0, lefty)
+print(p1)
+print(p2)
+print("==================")
+cv2.line(o, p1, p2, (0, 255, 0), 2)
+print([vx, vy, x, y])
+cv2.imshow("result", o)
+cv2.waitKey()
+cv2.destroyAllWindows()
