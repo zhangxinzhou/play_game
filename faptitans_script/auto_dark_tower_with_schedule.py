@@ -12,7 +12,7 @@ xy_close_rank_change = (-706, 211)
 
 
 def click_tower():
-    time.sleep(4)
+    time.sleep(5)
     pyautogui.moveTo(xy_tower[0], xy_tower[1])
     pyautogui.click()
 
