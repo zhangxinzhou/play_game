@@ -48,5 +48,6 @@ plt.scatter(b[:, 0], b[:, 1], 80, 'b', 's')
 plt.scatter(test[:, 0], test[:, 1], 80, 'r', '*')
 plt.show()
 # 打印原始测试数据test,预测结果
+print("=" * 20, "predict", "=" * 20)
 print(test)
 print(p2)
