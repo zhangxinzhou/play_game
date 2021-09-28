@@ -14,7 +14,7 @@ win_width, win_height = pyautogui.size()
 # 图片宽度,高度
 img_width, img_height = (1200, 640)
 # 基准xy(偏移量 )
-base_xy = (70, 103)
+base_xy = (360, 103)
 # 图片区域
 img_region = (base_xy[0], base_xy[1], img_width, img_height)
 
