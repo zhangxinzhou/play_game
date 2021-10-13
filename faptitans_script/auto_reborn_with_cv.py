@@ -124,7 +124,6 @@ def handle_skill():
 
 
 # 处理英雄
-# TODO 待处理技能升级
 def handle_hero():
     # N次
     for i in range(10):

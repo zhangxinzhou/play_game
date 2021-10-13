@@ -1,7 +1,7 @@
 import cv2
 import os
 
-file_path = r'E:\gta5\collect_data\2'
+file_path = r'E:\gta5\collect_data\0'
 file_list = os.listdir(file_path)
 for file_name in file_list:
     file_full_path = os.path.join(file_path, file_name)

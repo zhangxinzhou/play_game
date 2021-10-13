@@ -74,7 +74,6 @@ def get_keys_index(keys_list):
 
 
 game_title = r'Grand Theft Auto V'
-game_title = '下议院II'
 hwnd = win32gui.FindWindow(None, game_title)
 if hwnd == 0:
     print('can not find [{}]'.format(game_title))
