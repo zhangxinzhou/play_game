@@ -20,8 +20,18 @@ else:
     print("success find game [{}], handle = [{}]".format(game_title, handle))
     print("=" * 100)
 
+
+win32gui.GetWindowDC()
+
+
+rect = win32gui.GetWindowRect(handle)
+print("rect")
+print(rect)
+placement = win32gui.GetWindowPlacement(handle)
+print("placement")
+print(placement)
 # 修改游戏窗口尺寸
-win32gui.SetWindowPos(handle, win32con.HWND_TOPMOST, 0, 0, 500, 350, win32con.SWP_SHOWWINDOW)
+win32gui.SetWindowPos(handle, win32con.HWND_TOPMOST, None, None, 500, 350, win32con.SWP_SHOWWINDOW)
 # 聚焦游戏窗口
 win32gui.SetForegroundWindow(handle)
 
@@ -52,3 +62,4 @@ while True:
     q_pix_map = screen.grabWindow(handle)
     text = "size: [{}], cost: [{}] ms".format(q_pix_map.size(), 1000 * cost)
     print(text)
+    break

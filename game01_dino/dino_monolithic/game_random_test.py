@@ -20,6 +20,7 @@ else:
     print("success find game [{}], handle = [{}]".format(game_title, handle))
     print("=" * 100)
 
+rect = win32gui.GetWindowRect(handle)
 # 修改游戏窗口尺寸
 win32gui.SetWindowPos(handle, win32con.HWND_TOPMOST, 0, 0, 500, 350, win32con.SWP_SHOWWINDOW)
 # 聚焦游戏窗口
