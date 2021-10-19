@@ -27,11 +27,13 @@ else:
     print("success find game [{}], handle = [{}]".format(game_title, handle))
     print("=" * 100)
 
-w_pos = (10, 10, 500, 350)
-g_pos = (w_pos[0] + 8, w_pos[1] + 115, w_pos[2], w_pos[3] - 155)
+x0, y0, x1, y1 = win32gui.GetWindowRect(handle)
+width = 500
+height = 350
+new_pos = (x0 + 8, y0 + 115, width, height - 155)
 
-# 修改游戏窗口尺寸
-win32gui.SetWindowPos(handle, win32con.HWND_TOPMOST, w_pos[0], w_pos[1], w_pos[2], w_pos[3], win32con.SWP_SHOWWINDOW)
+# 不修改坐标,修改游戏窗口尺寸
+win32gui.MoveWindow(handle, x0, y0, width, height, False)
 # 聚焦游戏窗口
 win32gui.SetForegroundWindow(handle)
 
@@ -55,7 +57,7 @@ while True:
     t_total_start = time.time()
 
     t_grab_start = time.time()
-    q_pix_map = screen.grabWindow(0, g_pos[0], g_pos[1], g_pos[2], g_pos[3])
+    q_pix_map = screen.grabWindow(0, new_pos[0], new_pos[1], new_pos[2], new_pos[3])
     t_grab_end = time.time()
     t_grab_cost = (t_grab_end - t_grab_start) * 1000
 
