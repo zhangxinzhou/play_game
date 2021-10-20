@@ -1,6 +1,6 @@
+import numpy as np
 import random
 import win32gui
-import win32con
 import time
 import sys
 import pyautogui
@@ -78,6 +78,11 @@ while True:
     cv2.waitKey(1)
     t_show_end = time.time()
     t_show_cost = (t_show_end - t_show_start) * 1000
+
+    is_game_over = np.mean(mat2[100:130, 230:270, :]) > 80
+    print("is game over : {}".format(is_game_over))
+    if is_game_over:
+        exit(0)
 
     t_total_end = time.time()
     t_total_cost = (t_total_end - t_total_start) * 1000
