@@ -61,7 +61,7 @@ while True:
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     laplacian = cv2.Laplacian(img, cv2.CV_64F)
     laplacian = cv2.convertScaleAbs(laplacian)
-    candy = cv2.Canny(img, 128, 200)
+    candy = cv2.Canny(img, 100, 200)
     action = action_cv2(img)
     if action == 1:
         pyautogui.press('up')
