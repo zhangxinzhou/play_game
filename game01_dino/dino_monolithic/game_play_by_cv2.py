@@ -46,13 +46,9 @@ screen = app.primaryScreen()
 @jit()
 def action_cv2(image_tmp):
     has_obstacle = np.mean(image_tmp[140:160, 115:155]) > 50
-    has_bird = np.mean(image_tmp[80:110, 120:160]) > 50
-    action = 0
     if has_obstacle:
-        action = 1
-    elif has_bird:
-        action = 2
-    return action
+        return 1
+    return 0
 
 
 @jit()
@@ -76,7 +72,8 @@ while True:
         pyautogui.press('down')
 
     t_cycle_cost = (time.time() - t_cycle_start) * 1000
-    print("action :[{}], cost : [{:.2f}]".format(action, t_cycle_cost))
+    if action != 0:
+        print("action :[{}], cost : [{:.2f}]".format(action, t_cycle_cost))
     if game_over(img):
         print("game is over!!!")
         exit(0)
