@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import win32gui
 import time
 import sys
@@ -8,11 +7,6 @@ import cv2
 from PyQt5.QtWidgets import QApplication
 from public_utils import qpixmap_to_array
 from numba import jit
-
-"""
-比较满意的截图方式,速度很快,
-只是不太明白,为什么用传入handle截的图全是黑的,这里只能传0
-"""
 
 game_title = r'chrome://dino/ - Google Chrome'
 # 获取window句柄
@@ -68,8 +62,10 @@ while True:
     action = action_cv2(img)
     if action == 1:
         pyautogui.press('up')
-    elif action == 2:
-        pyautogui.press('down')
+
+    if True:
+        cv2.imshow('img', img)
+        cv2.waitKey(1)
 
     t_cycle_cost = (time.time() - t_cycle_start) * 1000
     if action != 0:
