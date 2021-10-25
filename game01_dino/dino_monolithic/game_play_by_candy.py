@@ -53,7 +53,7 @@ def action_cv2(image_tmp):
     if is_obstacle:
         return 1
     elif is_bird:
-        return 2
+        return 1
     return 0
 
 
