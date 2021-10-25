@@ -25,7 +25,9 @@ x0, y0, x1, y1 = win32gui.GetWindowRect(handle)
 width = 500
 height = 350
 new_pos = (x0 + 8, y0 + 115, width, height - 155)
-obstacle_pt1 = (100, 100)
+bird_pt1 = (100, 100)
+bird_pt2 = (160, 120)
+obstacle_pt1 = (100, 120)
 obstacle_pt2 = (150, 150)
 gm_pt1 = (135, 55)
 gm_pt2 = (365, 75)
@@ -41,22 +43,16 @@ screen = app.primaryScreen()
 
 # 行动,如果前方有障碍物就跳起来
 def action_cv2(image_tmp):
-    tmp = image_tmp[obstacle_pt1[1]:obstacle_pt2[1], obstacle_pt1[0]:obstacle_pt2[0]]
-    xy_loc = np.where(tmp == 255)
-    x_loc = xy_loc[0]
-    y_loc = xy_loc[1]
-    if len(x_loc) == 0:
-        return 0
-    x_median = np.median(x_loc)
-    y_median = np.median(y_loc)
-    xy_median = np.median(xy_loc)
+    obstacle_img = image_tmp[obstacle_pt1[1]:obstacle_pt2[1], obstacle_pt1[0]:obstacle_pt2[0]]
+    bird_img = image_tmp[bird_pt1[1]:bird_pt2[1], bird_pt1[0]:bird_pt2[0]]
+    obstacle_count = np.count_nonzero(obstacle_img)
+    bird_count = np.count_nonzero(bird_img)
+    is_obstacle = obstacle_count >= 30
+    is_bird = bird_count >= 30 and not is_obstacle
 
-    median_limit = np.abs(0.5 * (obstacle_pt2[1] - obstacle_pt1[1])) - 10
-    print(x_median, y_median, xy_median, median_limit)
-
-    if xy_median >= median_limit:
+    if is_obstacle:
         return 1
-    elif xy_median < median_limit:
+    elif is_bird:
         return 2
     return 0
 
@@ -69,10 +65,9 @@ def action_cv2(image_tmp):
 # 跳高
 # Runner.instance_.tRex.setJumpVelocity(1000000)
 def game_over(image_tmp):
-    tmp = image_tmp[gm_pt1[1]:gm_pt2[1], gm_pt1[0]:gm_pt2[0]]
-    tmp = np.where(tmp >= 255)
-    count = len(tmp[0])
-    return count >= 500
+    text_tmp = image_tmp[gm_pt1[1]:gm_pt2[1], gm_pt1[0]:gm_pt2[0]]
+    text_count = np.count_nonzero(text_tmp)
+    return text_count >= 500
 
 
 time.sleep(1)
@@ -94,6 +89,7 @@ while True:
     # cv2.imshow('img', img)
     cv2.rectangle(candy, gm_pt1, gm_pt2, (255, 255, 255), 1)
     cv2.rectangle(candy, obstacle_pt1, obstacle_pt2, (255, 255, 255), 1)
+    cv2.rectangle(candy, bird_pt1, bird_pt2, (255, 255, 255), 1)
     cv2.imshow("candy", candy)
     cv2.imwrite("candy.jpg", candy)
     cv2.waitKey(1)
