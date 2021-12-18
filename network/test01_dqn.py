@@ -11,9 +11,10 @@ for gpu in gpus:
 
 def main():
     step = 0
-    for episode in range(10):
+    for episode in range(1000):
         # initial observation
         observation = env.reset()
+        reward_sum = 0;
 
         while True:
             # fresh env
@@ -24,9 +25,7 @@ def main():
 
             # RL take action and get next observation and reward
             observation_, reward, done, info = env.step(action)
-            print("=" * 100)
-            print(f"observation={observation}, reward={reward}, done={done}, info={info}")
-            print(f"observation_={observation_}")
+            reward_sum += reward
 
             RL.store_transition(observation, action, reward, done, observation_)
 
@@ -41,7 +40,7 @@ def main():
             if done:
                 break
             step += 1
-        print("episode %d" % (episode + 1))
+        print(f"episode {episode + 1}, reward_sum = {reward_sum}")
     # end of game
     print('game over')
     env.close()

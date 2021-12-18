@@ -57,6 +57,7 @@ screen = app.primaryScreen()
 n_actions = 3
 # 图像像素
 n_features = new_pos[2] * new_pos[3]
+# n_features = (None, new_pos[2], new_pos[3])
 
 
 def game_over(game_frame):
