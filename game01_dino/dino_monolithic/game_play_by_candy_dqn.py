@@ -1,3 +1,4 @@
+import gc
 import numpy as np
 import win32gui
 import time
@@ -57,6 +58,8 @@ screen = app.primaryScreen()
 n_actions = 3
 # 图像像素
 n_features = new_pos[2] * new_pos[3]
+
+
 # n_features = (None, new_pos[2], new_pos[3])
 
 
@@ -68,6 +71,7 @@ def game_over(game_frame):
 
 # 重置游戏,当game over之后,等待三秒,然后游戏重新开始
 def game_reset():
+    gc.collect()
     time.sleep(2)
     print("=" * 50, "reset game", "=" * 50)
     pyautogui.press('up')
@@ -79,11 +83,32 @@ def get_game_frame():
     return game_frame
 
 
+# 行动,如果前方有障碍物就跳起来
+def has_obstacle(image_candy):
+    obstacle_img = image_candy[obstacle_pt1[1]:obstacle_pt2[1], obstacle_pt1[0]:obstacle_pt2[0]]
+    bird_img = image_candy[bird_pt1[1]:bird_pt2[1], bird_pt1[0]:bird_pt2[0]]
+    obstacle_count = np.count_nonzero(obstacle_img)
+    bird_count = np.count_nonzero(bird_img)
+    is_obstacle = obstacle_count >= 30
+    is_bird = bird_count >= 30 and not is_obstacle
+    return is_obstacle or is_bird
+
+
+def get_reword(is_ob, do_action):
+    # 无障碍物,采取行动0.1
+    # 无障碍物,不行动1
+    # 有障碍物,采取行动1
+    if not is_ob and do_action > 0:
+        return 0
+    else:
+        return 1
+
+
 # 主程序
 def main():
     RL = Deep_Q_Network(n_actions=n_actions, n_features=n_features)
     step = 0
-    for episode in range(10000):
+    for episode in range(1000):
         game_reset()
         frame_previous = get_game_frame()
         gray_previous = cv2.cvtColor(frame_previous, cv2.COLOR_BGR2GRAY)
@@ -108,9 +133,8 @@ def main():
             # 游戏是否结束
             is_game_over = game_over(candy_current)
             # 奖励,只要活着就能得到奖励
-            # 懒惰=多思考,谨慎行动,这里简单化,行动=乱动,乱动奖励就打折,鼓励多思考多分析少行动
-            discount = 1.0 if action == 0 else 0.7
-            reward = -100.0 if is_game_over else discount
+            is_obstacle = has_obstacle(candy_current)
+            reward = get_reword(is_obstacle, action)
 
             RL.store_transition(input_matrix_previous, action, reward, is_game_over, input_matrix_current)
 
@@ -124,7 +148,7 @@ def main():
             cv2.waitKey(1)
 
             t1 = time.time()
-            print(f"action={action},reward={reward},cost=[{(t1 - t0) * 1000} ] ms")
+            print(f"action={action},is_obstacle={is_obstacle},reward={reward},cost=[{(t1 - t0) * 1000} ] ms")
 
             # break while loop when end of this episode
             if is_game_over:
