@@ -8,7 +8,7 @@ import gym
 import tensorflow as tf
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--train', dest='train', default=True)
+parser.add_argument('--train', dest='train', default=False)
 parser.add_argument('--test', dest='test', default=True)
 
 parser.add_argument('--gamma', type=float, default=0.95)
@@ -55,7 +55,7 @@ class Agent:
         self.action_dim = self.env.action_space.n
 
         def create_model(input_state_shape):
-            model = tf.keras.models.Sequential(
+            return tf.keras.models.Sequential(
                 layers=[
                     tf.keras.layers.Input(input_state_shape),
                     tf.keras.layers.Dense(1024, activation='relu'),
@@ -65,11 +65,12 @@ class Agent:
                     tf.keras.layers.Dense(self.action_dim)
                 ]
             )
-            return model
 
         self.model = create_model([None, self.state_dim])
         self.target_model = create_model([None, self.state_dim])
+        # 训练模式
         # self.model.train()
+        # 评估模式
         # self.target_model.eval()
         self.model_optim = self.target_model_optim = tf.optimizers.Adam(learning_rate=args.learning_rate)
 
@@ -79,8 +80,7 @@ class Agent:
 
     def target_update(self):
         """Copy q network to target q network"""
-        for weights, target_weights in zip(
-                self.model.trainable_weights, self.target_model.trainable_weights):
+        for weights, target_weights in zip(self.model.trainable_weights, self.target_model.trainable_weights):
             target_weights.assign(weights)
 
     def choose_action(self, state):
@@ -150,13 +150,15 @@ class Agent:
             self.load()
             self.test_episode(test_episodes=args.test_episodes)
 
-    def save(self, path='./model/DQN/my_checkpoint'):
+    def save(self, path='./model/DQN/'):
         print("save model")
-        self.model.save_weights(path)
+        self.model.save_weights(os.path.join(path, 'model'))
+        self.target_model.save_weights(os.path.join(path, 'target_model'))
 
-    def load(self, path='./model/DQN/my_checkpoint'):
+    def load(self, path='./model/DQN/'):
         print("load model")
-        self.model.load_weights(path)
+        self.model.load_weights(os.path.join(path, 'model'))
+        self.target_model.load_weights(os.path.join(path, 'target_model'))
 
 
 if __name__ == '__main__':
