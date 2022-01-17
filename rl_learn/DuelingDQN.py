@@ -8,7 +8,7 @@ import gym
 import tensorflow as tf
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--train', dest='train', default=True)
+parser.add_argument('--train', dest='train', default=False)
 parser.add_argument('--test', dest='test', default=True)
 
 parser.add_argument('--gamma', type=float, default=0.95)
