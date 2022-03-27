@@ -7,6 +7,7 @@ import numpy as np
 import gym
 import tensorflow as tf
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--train', dest='train', default=False)
 parser.add_argument('--test', dest='test', default=True)

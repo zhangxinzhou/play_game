@@ -1,7 +1,7 @@
 import os
 import shutil
 
-path = r'F:\tmp'
+path = r'E:\BaiduNetdiskDownload\党史'
 
 for root, dirs, files in os.walk(path):
     print(f"root={root},dirs={dirs},files={files}")
