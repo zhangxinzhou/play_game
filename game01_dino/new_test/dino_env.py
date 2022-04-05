@@ -114,6 +114,7 @@ class DinoEnv(GameEnv, ABC):
         self.step_count = 0
         self.time_start = time.time()
         self.time_end = time.time()
+        self.time_cost = 0
 
     def render(self):
         cv2.imshow("candy", self.game_frame_candy)
