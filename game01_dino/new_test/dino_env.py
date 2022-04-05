@@ -130,7 +130,7 @@ class DinoEnv(GameEnv, ABC):
                 action = random.choice(arr)
                 game_frame, reward, is_game_over, step_count, time_cost = self.step(action)
                 print(
-                    f"step_count={step_count}, game_frame.shape={game_frame.shape}, reward={reward}, is_game_over={is_game_over}, time_cost={time_cost}")
+                    f"step_count={step_count}, game_frame.shape={game_frame.shape}, reward={reward}, is_game_over={is_game_over}, time_cost={int(time_cost * 1000)}ms")
                 self.render()
                 if is_game_over:
                     print("=" * 50, "game over", "=" * 50)
