@@ -112,6 +112,8 @@ class DinoEnv(GameEnv, ABC):
         print("=" * 50, "reset game", "=" * 50)
         pyautogui.press('up')
         self.step_count = 0
+        self.time_start = time.time()
+        self.time_end = time.time()
 
     def render(self):
         cv2.imshow("candy", self.game_frame_candy)
