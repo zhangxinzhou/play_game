@@ -134,6 +134,7 @@ class DinoEnv(GameEnv, ABC):
                 self.render()
                 if is_game_over:
                     print("=" * 50, "game over", "=" * 50)
+                    # 暂停两秒,因为游戏game over后有两秒时间无法操作
                     time.sleep(2)
                     break
 
