@@ -57,6 +57,11 @@ class DinoEnv(GameEnv, ABC):
         self.game_frame = None
         self.game_frame_candy = None
         self.step_count = 0
+
+        self.time_start = time.time()
+        self.time_end = time.time()
+        self.time_cost = 0
+
         self.action = None
         self.reward = None
         self.is_game_over = None
@@ -96,7 +101,11 @@ class DinoEnv(GameEnv, ABC):
         pixel_count = np.count_nonzero(text_detection)
         self.is_game_over = pixel_count >= 500
 
-        return self.game_frame, self.reward, self.is_game_over, self.step_count
+        time_current = time.time()
+        self.time_cost = time_current - self.time_end
+        self.time_end = time_current
+
+        return self.game_frame, self.reward, self.is_game_over, self.step_count, self.time_cost
 
     def reset(self):
         gc.collect()
@@ -119,7 +128,7 @@ class DinoEnv(GameEnv, ABC):
             self.reset()
             while True:
                 action = random.choice(arr)
-                game_frame, reward, is_game_over, step_count = self.step(action)
+                game_frame, reward, is_game_over, step_count, time_cost = self.step(action)
                 print(
                     f"step_count={step_count}, game_frame.shape={game_frame.shape}, reward={reward}, is_game_over={is_game_over}")
                 self.render()
