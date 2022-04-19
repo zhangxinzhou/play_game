@@ -51,7 +51,7 @@ screen = app.primaryScreen()
 class DinoEnv(GameEnv, ABC):
 
     def __init__(self):
-        self.game_frame_dim = width_offset * height_offset
+        self.game_frame_shape = (195, 500, 3)
         self.game_action_dim = 5
         self.q_pix_map = None
         self.game_frame = None
@@ -116,22 +116,40 @@ class DinoEnv(GameEnv, ABC):
         self.time_end = time.time()
         self.time_cost = 0
 
+        return np.zeros(shape=self.game_frame_shape, dtype=np.float32)
+
     def render(self):
-        cv2.imshow("candy", self.game_frame_candy)
+        window_name = 'candy'
+        cv2.imshow(window_name, self.game_frame_candy)
+        cv2.moveWindow(window_name, left, bottom)
         cv2.waitKey(1)
 
     def close(self):
         # 关闭游戏
         pass
 
+    def get_game_frame_shape(self):
+        return self.game_frame_shape
+
+    def get_game_frame_dim(self):
+        frame_dim = 1
+        for item in self.game_frame_shape:
+            frame_dim = frame_dim * item
+        return frame_dim
+
+    def get_game_action_dim(self):
+        return self.game_action_dim
+
     def test_random_action(self):
         arr = [0, 1, 2, 3, 4]
         for i in range(5):
             print(f"episode: [{i}]")
-            self.reset()
+            game_frame = self.reset()
+            print(game_frame.shape)
             while True:
                 action = random.choice(arr)
                 game_frame, reward, is_game_over, step_count, time_cost = self.step(action)
+                print(game_frame.shape)
                 print(
                     f"step_count={step_count}, game_frame.shape={game_frame.shape}, reward={reward}, is_game_over={is_game_over}, time_cost={int(time_cost * 1000)}ms")
                 self.render()

@@ -3,10 +3,9 @@ import os
 import random
 
 import numpy as np
-
-import gym
+import game_env_dino
 import tensorflow as tf
-
+import game_utils
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--train', dest='train', default=True)
@@ -22,11 +21,11 @@ parser.add_argument('--test_episodes', type=int, default=10)
 args = parser.parse_args()
 
 ALG_NAME = 'DuelingDQN'
-ENV_ID = 'CartPole-v1'
+ENV_ID = 'dino'
 
 
 class ReplayBuffer:
-    def __init__(self, capacity=10000):
+    def __init__(self, capacity=1000):
         self.capacity = capacity
         self.buffer = []
         self.position = 0
@@ -52,28 +51,18 @@ class ReplayBuffer:
 class Agent:
     def __init__(self, env):
         self.env = env
-        self.state_dim = self.env.observation_space.shape[0]
-        self.action_dim = self.env.action_space.n
+        self.input_shape = self.env.get_game_frame_shape()
+        self.output_dim = self.env.get_game_action_dim()
+        self.model_struct = [10, 10, 10]
 
-        def create_model(input_state_shape):
-            return tf.keras.models.Sequential(
-                layers=[
-                    tf.keras.layers.Input(input_state_shape),
-                    tf.keras.layers.Dense(1024, activation='relu'),
-                    tf.keras.layers.Dropout(0.5),
-                    tf.keras.layers.Dense(64, activation='relu'),
-                    tf.keras.layers.Dropout(0.5),
-                    tf.keras.layers.Dense(self.action_dim)
-                ]
-            )
+        self.model = game_utils.create_model(input_shape=self.input_shape,
+                                             output_dim=self.output_dim,
+                                             model_struct=self.model_struct)
 
+        self.target_model = game_utils.create_model(input_shape=self.input_shape,
+                                                    output_dim=self.output_dim,
+                                                    model_struct=self.model_struct)
 
-        self.model = create_model([None, self.state_dim])
-        self.target_model = create_model([None, self.state_dim])
-        # 训练模式
-        # self.model.train()
-        # 评估模式
-        # self.target_model.eval()
         self.model_optim = tf.optimizers.Adam(learning_rate=args.learning_rate)
 
         self.epsilon = args.eps
@@ -88,7 +77,7 @@ class Agent:
 
     def choose_action(self, state):
         if np.random.uniform() < self.epsilon:
-            return np.random.choice(self.action_dim)
+            return np.random.choice(self.output_dim)
         else:
             q_value = self.model(state[np.newaxis, :])[0]
             return np.argmax(q_value)
@@ -113,16 +102,15 @@ class Agent:
         max_reward = 0
         if args.train:
             for episode in range(train_episodes):
-                total_reward, done = 0, False
+                total_reward, is_game_over = 0, False
                 state = self.env.reset().astype(np.float32)
-                while not done:
+                while not is_game_over:
                     action = self.choose_action(state)
-                    next_state, reward, done, _ = self.env.step(action)
-                    next_state = next_state.astype(np.float32)
-                    self.buffer.push(state, action, reward, next_state, done)
+                    game_frame, reward, is_game_over, step_count, time_cost = self.env.step(action)
+                    game_frame = game_frame.astype(np.float32)
+                    self.buffer.push(state, action, reward, game_frame, is_game_over)
                     total_reward += reward
-                    state = next_state
-                    # self.render()
+                    state = game_frame
                 if len(self.buffer.buffer) > args.batch_size:
                     self.replay()
                     self.target_update()
@@ -141,7 +129,7 @@ class Agent:
             while not done:
                 action = self.model(np.array([state], dtype=np.float32))[0]
                 action = np.argmax(action)
-                next_state, reward, done, _ = self.env.step(action)
+                next_state, reward, done, step_count, time_cost = self.env.step(action)
                 next_state = next_state.astype(np.float32)
 
                 total_reward += reward
@@ -166,7 +154,7 @@ class Agent:
 
 
 if __name__ == '__main__':
-    env = gym.make(ENV_ID)
+    env = game_env_dino.DinoEnv()
     agent = Agent(env)
     agent.train(train_episodes=args.train_episodes)
     env.close()
