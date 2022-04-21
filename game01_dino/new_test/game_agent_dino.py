@@ -53,7 +53,7 @@ class Agent:
         self.env = env
         self.input_shape = self.env.get_game_frame_shape()
         self.output_dim = self.env.get_game_action_dim()
-        self.model_struct = [10, 10, 10]
+        self.model_struct = [1024, 100, 10]
 
         self.model = game_utils.create_model(input_shape=self.input_shape,
                                              output_dim=self.output_dim,

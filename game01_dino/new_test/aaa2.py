@@ -17,3 +17,9 @@ a = np.argmax(a)
 print(a)
 
 
+import uuid
+
+uid = uuid.uuid4()
+print(uid)
+print(uid.hex)
+print(type(uid))
