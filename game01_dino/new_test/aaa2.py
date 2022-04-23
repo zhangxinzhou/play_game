@@ -12,14 +12,19 @@ print(np.array(c).shape)
 d = (None, 4)
 print(d)
 
-a = [1,2,3]
+a = [1, 2, 3]
 a = np.argmax(a)
 print(a)
 
+tmp = []
+if type(tmp) == type(()):
+    print("1")
+    print(type(tmp))
+elif type(tmp) == type([]):
+    print("2")
+    print(type(tmp))
 
-import uuid
-
-uid = uuid.uuid4()
-print(uid)
-print(uid.hex)
-print(type(uid))
+if isinstance(tmp, tuple):
+    print("tuple")
+elif isinstance(tmp, list):
+    print("list")
