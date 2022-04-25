@@ -6,6 +6,9 @@ def model_evolution():
     # 训练最大世代
     generation_max = 1000
 
+    # 取出一个待训练的模型
+    model_dict = {}
+
     for generation_num in range(generation_max):
         # 查询全部待训练模型,如果没有则生成一个初始模型
         model_generation_list = []
