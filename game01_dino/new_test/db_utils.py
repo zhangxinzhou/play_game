@@ -102,7 +102,7 @@ def query_list_by_sql(sql: str) -> list:
     return fetchall_to_list(rows, description)
 
 
-def query_one_model_generation():
+def query_one_training_model_generation():
     # 优先获取训练中的模型-模型未训练完,找一个
     training_status = 'training'
     sql = f"select * from model_generation where training_status = '{training_status}' order by generation_num asc"
@@ -131,9 +131,26 @@ def count_model_generation() -> int:
     return obj.get("total", 0)
 
 
+def query_max_generation_num() -> int:
+    sql = "select max(generation_num) num from model_generation"
+    obj = query_one_by_sql(sql)
+    return obj.get("num", 0)
+
+
+def count_model_generation_by_generation_num(generation_num: int) -> int:
+    sql = f"select count(*) total from model_generation where generation_num = {generation_num}"
+    obj = query_one_by_sql(sql)
+    return obj.get("total", 0)
+
+
 def query_one_model_generation_by_model_id(model_id):
     sql = f"select * from model_generation where model_id = '{model_id}'"
     return query_one_by_sql(sql)
+
+
+def query_list_model_generation_by_generation_num(generation_num: int) -> int:
+    sql = f"select * from model_train_detail where generation_num = {generation_num}"
+    return query_list_by_sql(sql)
 
 
 def query_list_model_train_detail_by_model_id(model_id):
@@ -142,22 +159,22 @@ def query_list_model_train_detail_by_model_id(model_id):
 
 
 if __name__ == '__main__':
-    model_id = generate_uuid()
-    model_obj = {
-        "model_id": model_id,
-    }
-    train_list = [
-        {"model_id": model_id, "train_id": generate_uuid()},
-        {"model_id": model_id, "train_id": generate_uuid()},
-        {"model_id": model_id, "train_id": generate_uuid()}
-    ]
-    insert_model_generation(model_obj)
-    insert_model_train_detail(train_list)
-    oo: dict = query_one_model_generation_by_model_id(model_id)
-    ll: list = query_list_model_train_detail_by_model_id(model_id)
-    print(oo)
-    for item in ll:
-        print(item)
-
+    # 数据测试
+    # model_id = generate_uuid()
+    # model_obj = {
+    #     "model_id": model_id,
+    # }
+    # train_list = [
+    #     {"model_id": model_id, "train_id": generate_uuid()},
+    #     {"model_id": model_id, "train_id": generate_uuid()},
+    #     {"model_id": model_id, "train_id": generate_uuid()}
+    # ]
+    # insert_model_generation(model_obj)
+    # insert_model_train_detail(train_list)
+    # oo: dict = query_one_model_generation_by_model_id(model_id)
+    # ll: list = query_list_model_train_detail_by_model_id(model_id)
+    # print(oo)
+    # for item in ll:
+    #     print(item)
     count = count_model_generation()
     print(count)
