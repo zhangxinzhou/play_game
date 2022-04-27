@@ -1,11 +1,16 @@
+import time
 import db_utils
 
+# 环境容量-一代模型最大数量
+env_capacity = 100
+# 年龄限制,就是训练多少轮数
+year_limit = 60
+# 月数限制,就是一年训练多少次
+month_limit = 12
 
-# 演化主流程
+
+# 模型演化主流程
 def model_evolution():
-    # 环境容量-一代模型最大数量
-    env_capacity = 100
-
     while True:
         # 判断是否有模型,如果没有,那就是第一次执行,需要初始化一个最初的模型,这就是初代模型
         is_init = db_utils.count_model_generation() == 0
@@ -17,7 +22,14 @@ def model_evolution():
         # 开始训练模型
         training_model_obj = db_utils.query_one_training_model_generation()
         if training_model_obj is not None:
-            # 训练模型
+            # 开始训练模型
+            # 模型表更新状态为训练中,更新模型开始训练时间
+            t0 = time.time()
+            for year in range(1, year_limit + 1):
+                for month in range(1, month_limit + 1):
+                    pass
+            # 模型表更新状态为已完成,更新训练花费时间
+            training_time_cost = time.time() - t0
             pass
         else:
             # 待训练模型,训练完毕

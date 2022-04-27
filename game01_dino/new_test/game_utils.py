@@ -39,14 +39,24 @@ def model_mutation():
     pass
 
 
-def create_model(input_shape, output_dim, model_struct):
+def create_model(input_shape, output_dim, hidden_layer: dict):
+    convolutional_layer = hidden_layer.get("convolutional_layer")
+    fully_connected_layer = hidden_layer.get("fully_connected_layer")
     # 创建模型
     model = Sequential()
     model.add(Flatten(input_shape=input_shape))
-    for index, item in enumerate(model_struct):
-        model.add(Dense(item, activation='relu'))
-        model.add(Dropout(0.2))
-    model.add(Dense(output_dim, activation='softmax'))
+
+    if convolutional_layer is not None:
+        # 处理卷积层
+        pass
+
+    if fully_connected_layer is not None:
+        # 处理全连接层
+        for index, item in enumerate(fully_connected_layer):
+            model.add(Dense(item, activation='relu'))
+            model.add(Dropout(0.2))
+        model.add(Dense(output_dim, activation='softmax'))
+
     return model
 
 
