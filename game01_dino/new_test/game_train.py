@@ -7,6 +7,8 @@ env_capacity = 100
 year_limit = 60
 # 月数限制,就是一年训练多少次
 month_limit = 12
+# 训练总数
+step_total = year_limit * month_limit
 
 
 # 模型演化主流程
@@ -24,12 +26,18 @@ def model_evolution():
         if training_model_obj is not None:
             # 开始训练模型
             # 模型表更新状态为训练中,更新模型开始训练时间
-            t0 = time.time()
+            step_max = 10
+            for step_num in range(step_max, step_total):
+                year = int(step_num / 12) + 1
+                month = step_num % 12
+
             for year in range(1, year_limit + 1):
                 for month in range(1, month_limit + 1):
+                    step_num = (year - 1) * 12 + month
                     pass
+            # 模型训练完成
+            # 取出模型的全部训练数据
             # 模型表更新状态为已完成,更新训练花费时间
-            training_time_cost = time.time() - t0
             pass
         else:
             # 待训练模型,训练完毕
