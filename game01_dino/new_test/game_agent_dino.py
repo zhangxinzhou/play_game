@@ -53,15 +53,18 @@ class Agent:
         self.env = env
         self.input_shape = self.env.get_game_frame_shape()
         self.output_dim = self.env.get_game_action_dim()
-        self.model_struct = [1024, 100, 10]
+        self.hidden_layer = {
+            "convolutional_layer": [],
+            "fully_connected_layer": [100, 20, 10]
+        }
 
         self.model = game_utils.create_model(input_shape=self.input_shape,
                                              output_dim=self.output_dim,
-                                             model_struct=self.model_struct)
+                                             hidden_layer=self.hidden_layer)
 
         self.target_model = game_utils.create_model(input_shape=self.input_shape,
                                                     output_dim=self.output_dim,
-                                                    model_struct=self.model_struct)
+                                                    hidden_layer=self.hidden_layer)
 
         self.model_optim = tf.optimizers.Adam(learning_rate=args.learning_rate)
 

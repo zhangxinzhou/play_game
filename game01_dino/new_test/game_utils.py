@@ -47,6 +47,7 @@ def create_model(input_shape, output_dim, hidden_layer: dict):
     model.add(Flatten(input_shape=input_shape))
 
     if convolutional_layer is not None:
+        # 待实现
         # 处理卷积层
         pass
 
