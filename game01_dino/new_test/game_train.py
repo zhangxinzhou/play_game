@@ -4,11 +4,11 @@ import db_utils
 # 环境容量-一代模型最大数量
 env_capacity = 100
 # 年龄限制,就是训练多少轮数
-year_limit = 60
-# 月数限制,就是一年训练多少次
-month_limit = 12
-# 训练总数
-step_total = year_limit * month_limit
+age_limit = 60
+# 训练次数
+train_episodes = 200
+# 评估次数
+test_episodes = 12
 
 
 # 模型演化主流程
@@ -26,10 +26,9 @@ def model_evolution():
         if training_model_obj is not None:
             # 开始训练模型
             # 模型表更新状态为训练中,更新模型开始训练时间
-            for year in range(1, year_limit + 1):
-                for month in range(1, month_limit + 1):
-                    step_num = (year - 1) * 12 + month
-                    pass
+            for year in range(1, age_limit + 1):
+                pass
+
             # 模型训练完成
             # 取出模型的全部训练数据
             # 模型表更新状态为已完成,更新训练花费时间
@@ -54,3 +53,7 @@ def model_evolution():
                 son_model_list = []
                 db_utils.insert_model_generation(son_model_list)
             continue
+
+
+if __name__ == '__main__':
+    model_evolution()
