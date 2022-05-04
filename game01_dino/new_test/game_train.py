@@ -26,7 +26,11 @@ def model_evolution():
         if training_model_obj is not None:
             # 开始训练模型
             # 模型表更新状态为训练中,更新模型开始训练时间
-            for year in range(1, age_limit + 1):
+            # 查询待训练模型当前最大年龄 select coalesce(max(age_num),0) age_max from model_train_detail where model_id = '1'
+            age_max = 0
+            age_next = age_max + 1
+            for age in range(age_next, age_limit + 1):
+                # 一岁训练一次模型,一次模型训练需要执行train_episodes次游戏来更新参数,一次模型训练需要评估test_episodes次,来计算得分
                 pass
 
             # 模型训练完成
