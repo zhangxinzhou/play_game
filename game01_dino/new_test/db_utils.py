@@ -137,6 +137,12 @@ def query_max_generation_num() -> int:
     return obj.get("num", 0)
 
 
+def query_max_age_by_model_id(model_id: str) -> int:
+    sql = f"select coalesce(max(age_num),0) age_max from model_train_detail where model_id = '{model_id}'"
+    obj = query_one_by_sql(sql)
+    return obj.get("age_max", 0)
+
+
 def count_model_generation_by_generation_num(generation_num: int) -> int:
     sql = f"select count(*) total from model_generation where generation_num = {generation_num}"
     obj = query_one_by_sql(sql)

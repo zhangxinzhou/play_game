@@ -1,4 +1,5 @@
 import time
+import random
 import db_utils
 
 # 环境容量-一代模型最大数量
@@ -13,12 +14,18 @@ test_episodes = 12
 
 # 模型演化主流程
 def model_evolution():
-    while True:
+    a = 0
+    while a < 10:
+        a += 1
         # 判断是否有模型,如果没有,那就是第一次执行,需要初始化一个最初的模型,这就是初代模型
         is_init = db_utils.count_model_generation() == 0
         if is_init:
             # 初始化一个最初模型,存入数据库
-            init_model_obj = {}
+            init_model_obj = {
+                "model_id": db_utils.generate_uuid(),
+                "generation_num": 0,
+                "training_status": "training"
+            }
             db_utils.insert_model_generation(init_model_obj)
 
         # 开始训练模型
@@ -26,17 +33,26 @@ def model_evolution():
         if training_model_obj is not None:
             # 开始训练模型
             # 模型表更新状态为训练中,更新模型开始训练时间
-            # 查询待训练模型当前最大年龄 select coalesce(max(age_num),0) age_max from model_train_detail where model_id = '1'
-            age_max = 0
+            # 查询待训练模型当前最大年龄
+            model_id = training_model_obj.get("model_id")
+            age_max = db_utils.query_max_age_by_model_id(model_id)
             age_next = age_max + 1
             for age in range(age_next, age_limit + 1):
                 # 一岁训练一次模型,一次模型训练需要执行train_episodes次游戏来更新参数,一次模型训练需要评估test_episodes次,来计算得分
-                pass
+                train_obj = {
+                    "train_id": db_utils.generate_uuid(),
+                    "model_id": model_id,
+                    "score_total": random.randint(1, 100)
+                }
+                db_utils.insert_model_train_detail(train_obj)
 
             # 模型训练完成
             # 取出模型的全部训练数据
+            train_list = db_utils.query_list_model_train_detail_by_model_id(model_id)
+            # 取出分数最好的age,删除其他age的模型
+            best_train_obj = 00
             # 模型表更新状态为已完成,更新训练花费时间
-            pass
+
         else:
             # 待训练模型,训练完毕
             # 说明最新一代的模型全部训练完毕
