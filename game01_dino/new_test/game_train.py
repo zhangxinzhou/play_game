@@ -32,9 +32,10 @@ def model_evolution():
         training_model_obj = db_utils.query_one_training_model_generation()
         if training_model_obj is not None:
             # 开始训练模型
-            # 模型表更新状态为训练中,更新模型开始训练时间
-            # 查询待训练模型当前最大年龄
             model_id = training_model_obj.get("model_id")
+            # 模型表更新状态为训练中,更新模型开始训练时间
+            db_utils.update_model_generation_start_time(model_id)
+            # 查询待训练模型当前最大年龄
             age_max = db_utils.query_max_age_by_model_id(model_id)
             age_next = age_max + 1
             for age in range(age_next, age_limit + 1):
@@ -42,16 +43,20 @@ def model_evolution():
                 train_obj = {
                     "train_id": db_utils.generate_uuid(),
                     "model_id": model_id,
-                    "score_total": random.randint(1, 100)
+                    "score_total": random.randint(1, 100),
+                    "age_num": age
                 }
                 db_utils.insert_model_train_detail(train_obj)
 
             # 模型训练完成
-            # 取出模型的全部训练数据
+            # 取出模型的全部训练数据,并排序
             train_list = db_utils.query_list_model_train_detail_by_model_id(model_id)
-            # 取出分数最好的age,删除其他age的模型
-            best_train_obj = 00
+            train_list.sort(key=lambda item: (item.get('score_total', 0)), reverse=True)
+            train_obj_best = train_list[0]
+            best_age = train_obj_best.get("age_num")
+            best_score = train_obj_best.get("score_total")
             # 模型表更新状态为已完成,更新训练花费时间
+            db_utils.update_model_generation_end_time(model_id, best_age, best_score)
 
         else:
             # 待训练模型,训练完毕

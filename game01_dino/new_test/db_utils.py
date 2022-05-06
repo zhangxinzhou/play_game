@@ -164,6 +164,34 @@ def query_list_model_train_detail_by_model_id(model_id):
     return query_list_by_sql(sql)
 
 
+def update_model_generation_start_time(model_id: str):
+    sql = f'''
+        update model_generation 
+        set 
+        updated_date = now(),
+        training_start_date = now()
+        where model_id = '{model_id}'
+    '''
+    curs.execute(sql)
+    curs.execute("commit;")
+
+
+def update_model_generation_end_time(model_id: str, best_age, best_score):
+    sql = f'''
+        update model_generation 
+        set 
+        updated_date = now(),
+        training_status = 'finished',
+        training_end_date  = now(),
+        training_cost_time = now() - training_start_date,
+        best_age = {best_age},
+        best_score = {best_score}
+        where model_id = '{model_id}'
+    '''
+    curs.execute(sql)
+    curs.execute("commit;")
+
+
 if __name__ == '__main__':
     # 数据测试
     # model_id = generate_uuid()
