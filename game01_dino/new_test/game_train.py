@@ -24,7 +24,7 @@ def model_evolution():
             init_model_obj = {
                 "model_id": db_utils.generate_uuid(),
                 "generation_num": 0,
-                "training_status": "training"
+                "training_status": "init"
             }
             db_utils.insert_model_generation(init_model_obj)
 
@@ -64,20 +64,33 @@ def model_evolution():
             # 1.首先取出最新一世代的全部模型
             last_generation_num = db_utils.query_max_generation_num()
             next_generation_num = last_generation_num + 1
-            finished_model_list = db_utils.query_list_model_generation_by_generation_num(last_generation_num)
+            finished_model_list: list = db_utils.query_list_model_generation_by_generation_num(last_generation_num)
             # 2.将最新一世代的训练完成的模型,按照优秀程度来排序,最优秀的越排最前面
-            finished_model_list = []  # 按优秀程度排序,最优秀的越排最前面
+            finished_model_list.sort(key=lambda item: (item.get('best_score', 0)), reverse=True)
             # 3.优秀的模型开始获得繁衍下一代的权力
             for finished_model_obj in finished_model_list:
                 next_generation_count = db_utils.count_model_generation_by_generation_num(next_generation_num)
-                if next_generation_count >= env_capacity:
+                if next_generation_count <= env_capacity:
                     # 如果下一代的模型数量达到了环境容量,则繁衍结束
-                    break
-
-                # 模型变异,并将模型变异的数据插入数据库
-                son_model_list = []
-                db_utils.insert_model_generation(son_model_list)
-            continue
+                    # 模型变异,并将模型变异的数据插入数据库
+                    son_model_list = [
+                        {
+                            "model_id": db_utils.generate_uuid(),
+                            "generation_num": next_generation_num,
+                            "training_status": "init"
+                        },
+                        {
+                            "model_id": db_utils.generate_uuid(),
+                            "generation_num": next_generation_num,
+                            "training_status": "init"
+                        },
+                        {
+                            "model_id": db_utils.generate_uuid(),
+                            "generation_num": next_generation_num,
+                            "training_status": "init"
+                        }
+                    ]
+                    db_utils.insert_model_generation(son_model_list)
 
 
 if __name__ == '__main__':

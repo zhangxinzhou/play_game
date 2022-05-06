@@ -155,7 +155,7 @@ def query_one_model_generation_by_model_id(model_id):
 
 
 def query_list_model_generation_by_generation_num(generation_num: int) -> int:
-    sql = f"select * from model_train_detail where generation_num = {generation_num}"
+    sql = f"select * from model_generation where generation_num = {generation_num}"
     return query_list_by_sql(sql)
 
 
@@ -169,6 +169,7 @@ def update_model_generation_start_time(model_id: str):
         update model_generation 
         set 
         updated_date = now(),
+        training_status = 'training',
         training_start_date = now()
         where model_id = '{model_id}'
     '''
