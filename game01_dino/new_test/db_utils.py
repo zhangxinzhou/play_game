@@ -27,13 +27,14 @@ def get_insert_sql(table_name, row: dict):
     key_str = ""
     val_str = ""
     for index, (key, value) in enumerate(row.items()):
+        if value is None:
+            continue
         prefix = "" if index == 0 else ","
         if isinstance(value, str):
             value = "'" + value + "'"
         key_str += prefix + key
         val_str += prefix + str(value)
     sql += " (" + key_str + ") values (" + val_str + ");"
-    # print(sql)
     return sql
 
 
@@ -168,26 +169,52 @@ def update_model_generation_start_time(model_id: str):
     sql = f'''
         update model_generation 
         set 
-        updated_date = now(),
         training_status = 'training',
-        training_start_date = now()
+        training_start_date = now(),
+        updated_date = now()
         where model_id = '{model_id}'
     '''
     curs.execute(sql)
     curs.execute("commit;")
 
 
-def update_model_generation_end_time(model_id: str, best_age, best_score):
+def update_model_generation_end_time(model_id: str, model_path: str, best_age, best_score):
     sql = f'''
         update model_generation 
         set 
-        updated_date = now(),
         training_status = 'finished',
         training_end_date  = now(),
         training_cost_time = now() - training_start_date,
+        model_path = '{model_path}',
         best_age = {best_age},
-        best_score = {best_score}
+        best_score = {best_score},
+        updated_date = now()
         where model_id = '{model_id}'
+    '''
+    curs.execute(sql)
+    curs.execute("commit;")
+
+
+def update_model_train_detail_start_time(train_id: str):
+    sql = f'''
+        update model_train_detail 
+        set 
+        training_start_date = now(),
+        updated_date = now()
+        where train_id  = '{train_id}'
+    '''
+    curs.execute(sql)
+    curs.execute("commit;")
+
+
+def update_model_train_detail_end_time(train_id: str):
+    sql = f'''
+        update model_train_detail 
+        set 
+        updated_date = now(),
+        training_end_date  = now(),
+        training_cost_time = now() - training_start_date
+        where train_id  = '{train_id}'
     '''
     curs.execute(sql)
     curs.execute("commit;")
