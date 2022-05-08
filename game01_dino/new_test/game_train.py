@@ -24,7 +24,7 @@ input_shape = (195, 500, 3)
 output_dim = 5
 # 初始隐藏层
 init_hidden_layer = {
-    "mutation_type": "",
+    "mutation_type": "init",
     "convolutional_layer": [],
     "fully_connected_layer": [1024, 100, 10]
 }
@@ -101,9 +101,13 @@ def model_evolution():
             best_age = train_obj_best.get("age_num")
             best_score = train_obj_best.get("score_total")
             best_model_path = train_obj_best.get("model_path")
-            # 模型表更新状态为已完成,更新训练花费时间
             # 删除best_age之外的模型
+            for index, tmp_obj in enumerate(train_obj_best):
+                delete_model_path = tmp_obj.get("model_path")
+                if index >= 1:
+                    game_utils.remove_folder(delete_model_path)
 
+            # 模型表更新状态为已完成,更新训练花费时间
             db_utils.update_model_generation_end_time(model_id, best_model_path, best_age, best_score)
 
         else:
