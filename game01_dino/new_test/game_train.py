@@ -4,6 +4,8 @@ import random
 import copy
 import db_utils
 import game_utils
+import game_env_dino
+import game_agent_dino
 
 # 模型根路径
 model_root_path = r"F:\models"
@@ -14,9 +16,9 @@ env_capacity = 100
 # 年龄限制,就是训练多少轮数
 age_limit = 60
 # 训练次数
-train_episodes = 200
+train_episodes = 10
 # 评估次数
-test_episodes = 12
+test_episodes = 10
 # 初始隐藏层
 # 游戏画面
 input_shape = (195, 500, 3)
@@ -28,6 +30,8 @@ init_hidden_layer = {
     "convolutional_layer": [],
     "fully_connected_layer": [1024, 100, 10]
 }
+# 游戏环境
+env = game_env_dino.DinoEnv()
 
 
 # 模型演化主流程
@@ -81,17 +85,21 @@ def model_evolution():
                     "age_num": age,
                     "input_shape": json.dumps(train_input_shape),
                     "output_dim": train_output_dim,
-                    "hidden_layer": json.dumps(train_hidden_layer),
-                    "score_total": random.randint(1, 100),
+                    "hidden_layer": json.dumps(train_hidden_layer)
                 }
                 db_utils.insert_model_train_detail(train_obj)
 
                 # 训练开始
                 db_utils.update_model_train_detail_start_time(train_id)
-                # TODO
+                #
+
+                hidden_layer = {}
+                model_path = r"F:\models\dino\_test"
+                agent = game_agent_dino.Agent(env, hidden_layer, model_path)
+                score_total = agent.train(train_episodes=train_episodes, test_episodes=test_episodes)
 
                 # 训练结束
-                db_utils.update_model_train_detail_end_time(train_id)
+                db_utils.update_model_train_detail_end_time(train_id, score_total)
 
             # 模型训练完成
             # 取出模型的全部训练数据,并排序

@@ -207,13 +207,14 @@ def update_model_train_detail_start_time(train_id: str):
     curs.execute("commit;")
 
 
-def update_model_train_detail_end_time(train_id: str):
+def update_model_train_detail_end_time(train_id: str, score_total):
     sql = f'''
         update model_train_detail 
         set 
         updated_date = now(),
         training_end_date  = now(),
-        training_cost_time = now() - training_start_date
+        training_cost_time = now() - training_start_date,
+        score_total = {score_total}
         where train_id  = '{train_id}'
     '''
     curs.execute(sql)

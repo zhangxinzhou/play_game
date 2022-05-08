@@ -1,6 +1,7 @@
 import argparse
 import os
 import random
+import time
 
 import numpy as np
 import game_env_dino
@@ -17,7 +18,7 @@ parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--eps', type=float, default=0.1)
 
 parser.add_argument('--train_episodes', type=int, default=200)
-parser.add_argument('--test_episodes', type=int, default=10)
+parser.add_argument('--test_episodes', type=int, default=20)
 args = parser.parse_args()
 
 ALG_NAME = 'DuelingDQN'
@@ -49,14 +50,12 @@ class ReplayBuffer:
 
 
 class Agent:
-    def __init__(self, env):
+    def __init__(self, env, hidden_layer, model_path):
         self.env = env
+        self.model_path = model_path
         self.input_shape = self.env.get_game_frame_shape()
         self.output_dim = self.env.get_game_action_dim()
-        self.hidden_layer = {
-            "convolutional_layer": [],
-            "fully_connected_layer": [100, 20, 10]
-        }
+        self.hidden_layer = hidden_layer
 
         self.model = game_utils.create_model(input_shape=self.input_shape,
                                              output_dim=self.output_dim,
@@ -101,7 +100,7 @@ class Agent:
             grads = tape.gradient(loss, self.model.trainable_weights)
             self.model_optim.apply_gradients(zip(grads, self.model.trainable_weights))
 
-    def train(self, train_episodes=200):
+    def train(self, train_episodes=200, test_episodes=20):
         max_reward = 0
         if args.train:
             for episode in range(train_episodes):
@@ -120,44 +119,57 @@ class Agent:
                 if total_reward > max_reward:
                     max_reward = total_reward
                     self.save()
+                if is_game_over:
+                    # 暂停两秒,因为游戏game over后有两秒时间无法操作
+                    time.sleep(3)
                 print('EP{} Episode Reward={} , Max Reward={}'.format(episode, total_reward, max_reward))
         if args.test:
             self.load()
-            self.test_episode(test_episodes=args.test_episodes)
+            return self.test_episode(test_episodes=test_episodes)
 
     def test_episode(self, test_episodes):
+        total_reward_list = []
         for episode in range(test_episodes):
+            total_reward, is_game_over = 0, False
             state = self.env.reset().astype(np.float32)
-            total_reward, done = 0, False
-            while not done:
+            while not is_game_over:
                 action = self.model(np.array([state], dtype=np.float32))[0]
                 action = np.argmax(action)
-                next_state, reward, done, step_count, time_cost = self.env.step(action)
-                next_state = next_state.astype(np.float32)
-
+                game_frame, reward, is_game_over, step_count, time_cost = self.env.step(action)
+                game_frame = game_frame.astype(np.float32)
                 total_reward += reward
-                state = next_state
-                self.env.render()
+                state = game_frame
+                # self.env.render()
+
+            if is_game_over:
+                # 暂停两秒,因为游戏game over后有两秒时间无法操作
+                time.sleep(3)
             print("Test {} | episode rewards is {}".format(episode, total_reward))
+            total_reward_list.append(total_reward)
+        total_reward_avg = sum(total_reward_list) / test_episodes
+        print(f"total_reward_avg={total_reward_avg}")
+        return total_reward_avg
 
-    def save(self, path=f'./model/{ALG_NAME}/'):
-        if not os.path.exists(path):
-            os.makedirs(path)
+    def save(self):
+        if not os.path.exists(self.model_path):
+            os.makedirs(self.model_path)
         print("save model")
-        tf.saved_model.save(self.model, os.path.join(path, 'model'))
-        tf.saved_model.save(self.target_model, os.path.join(path, 'target_model'))
+        tf.saved_model.save(self.model, os.path.join(self.model_path, 'model'))
+        tf.saved_model.save(self.target_model, os.path.join(self.model_path, 'target_model'))
 
-    def load(self, path=f'./model/{ALG_NAME}/'):
-        if not os.path.exists(path):
+    def load(self):
+        if not os.path.exists(self.model_path):
             print("can not find model path ,so can not load model")
             exit(-1)
         print("load model")
-        self.model = tf.saved_model.load(os.path.join(path, 'model'))
-        self.target_model = tf.saved_model.load(os.path.join(path, 'target_model'))
+        self.model = tf.saved_model.load(os.path.join(self.model_path, 'model'))
+        self.target_model = tf.saved_model.load(os.path.join(self.model_path, 'target_model'))
 
 
 if __name__ == '__main__':
     env = game_env_dino.DinoEnv()
-    agent = Agent(env)
-    agent.train(train_episodes=args.train_episodes)
+    hidden_layer = {}
+    model_path = r"F:\models\dino\_test"
+    agent = Agent(env, hidden_layer, model_path)
+    agent.train(train_episodes=args.train_episodes, test_episodes=args.test_episodes)
     env.close()
