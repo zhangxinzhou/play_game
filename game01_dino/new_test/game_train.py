@@ -101,7 +101,7 @@ def model_evolution():
             best_age = train_obj_best.get("age_num")
             best_score = train_obj_best.get("score_total")
             best_model_path = train_obj_best.get("model_path")
-            # 删除best_age之外的模型
+            # 删除best_age之外的模型(如果自己的磁盘空间够,就不需要删除)
             for index, tmp_obj in enumerate(train_obj_best):
                 delete_model_path = tmp_obj.get("model_path")
                 if index >= 1:
