@@ -16,7 +16,7 @@ env_capacity = 100
 # 年龄限制,就是训练多少轮数
 age_limit = 60
 # 训练次数
-train_episodes = 10
+train_episodes = 100
 # 评估次数
 test_episodes = 10
 # 初始隐藏层
