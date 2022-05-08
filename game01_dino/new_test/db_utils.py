@@ -155,7 +155,7 @@ def query_one_model_generation_by_model_id(model_id):
     return query_one_by_sql(sql)
 
 
-def query_list_model_generation_by_generation_num(generation_num: int) -> int:
+def query_list_model_generation_by_generation_num(generation_num: int) -> list:
     sql = f"select * from model_generation where generation_num = {generation_num}"
     return query_list_by_sql(sql)
 

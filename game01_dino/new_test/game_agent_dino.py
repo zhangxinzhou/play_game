@@ -144,16 +144,16 @@ class Agent:
         if not os.path.exists(path):
             os.makedirs(path)
         print("save model")
-        self.model.save_weights(os.path.join(path, 'model'))
-        self.target_model.save_weights(os.path.join(path, 'target_model'))
+        tf.saved_model.save(self.model, os.path.join(path, 'model'))
+        tf.saved_model.save(self.target_model, os.path.join(path, 'target_model'))
 
     def load(self, path=f'./model/{ALG_NAME}/'):
         if not os.path.exists(path):
             print("can not find model path ,so can not load model")
             exit(-1)
         print("load model")
-        self.model.load_weights(os.path.join(path, 'model'))
-        self.target_model.load_weights(os.path.join(path, 'target_model'))
+        self.model = tf.saved_model.load(os.path.join(path, 'model'))
+        self.target_model = tf.saved_model.load(os.path.join(path, 'target_model'))
 
 
 if __name__ == '__main__':

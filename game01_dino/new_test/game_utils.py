@@ -1,4 +1,5 @@
 import os
+import shutil
 import numpy as np
 import cv2
 import random
@@ -29,16 +30,6 @@ def img_to_candy(img):
     return img_candy
 
 
-def model_mutation():
-    # 模型变异-变异程度由低到高
-    # 1.完全继承/复制-降低lr重训练
-    # 2.完全继承/复制-并重训练
-    # 3.数量不变,结构重排,并重训练
-    # 4.降低5%结构,并重训练
-    # 5.增加5%结构,并重训练
-    pass
-
-
 def create_model(input_shape, output_dim, hidden_layer: dict):
     convolutional_layer = hidden_layer.get("convolutional_layer")
     fully_connected_layer = hidden_layer.get("fully_connected_layer")
@@ -61,7 +52,24 @@ def create_model(input_shape, output_dim, hidden_layer: dict):
     return model
 
 
-def arr_mutations(arr_old):
+def model_mutation():
+    # 模型变异-变异程度由低到高
+    # 1.完全继承/复制-降低lr重训练
+    # 2.完全继承/复制-并重训练
+    # 3.数量不变,结构重排,并重训练
+    # 4.降低5%结构,并重训练
+    # 5.增加5%结构,并重训练
+    pass
+
+
+def arr_mutation_rearrange(arr_old):
+    # 随机重排
+    arr_new = copy.deepcopy(arr_old)
+    random.shuffle(arr_new)
+    return arr_new
+
+
+def arr_mutation_increase(arr_old):
     arr_new = copy.deepcopy(arr_old)
 
     length = len(arr_new)
@@ -73,10 +81,46 @@ def arr_mutations(arr_old):
     return arr_new
 
 
-def get_model_path(root_path, game_name, model_id):
-    # 拼接model路径
-    full_path = os.path.join(root_path, game_name, model_id)
-    return full_path
+def arr_mutation_decrease(arr_old):
+    arr_new = copy.deepcopy(arr_old)
+
+    length = len(arr_new)
+    random_index = random.randint(0, length - 1)
+    decrease = int(arr_new[random_index] * 0.05)
+    if decrease == 0:
+        decrease = 1
+    arr_new[random_index] = arr_new[random_index] - decrease
+    if arr_new[random_index] <= 0:
+        arr_new[random_index] = 1
+    return arr_new
+
+
+def hidden_layer_mutation(hidden_layer: dict):
+    convolutional_layer = hidden_layer.get("convolutional_layer")
+    fully_connected_layer = hidden_layer.get("fully_connected_layer")
+
+    return [
+        {
+            "mutation_type": "origin",
+            "convolutional_layer": convolutional_layer,
+            "fully_connected_layer": copy.deepcopy(fully_connected_layer)
+        },
+        {
+            "mutation_type": "mutations_rearrange",
+            "convolutional_layer": convolutional_layer,
+            "fully_connected_layer": arr_mutation_rearrange(fully_connected_layer)
+        },
+        {
+            "mutation_type": "mutations_increase",
+            "convolutional_layer": convolutional_layer,
+            "fully_connected_layer": arr_mutation_increase(fully_connected_layer)
+        },
+        {
+            "mutation_type": "mutations_decrease",
+            "convolutional_layer": convolutional_layer,
+            "fully_connected_layer": arr_mutation_decrease(fully_connected_layer)
+        }
+    ]
 
 
 def model_save(model, model_path):
@@ -93,3 +137,15 @@ def model_load(model_path):
         exit(-1)
     model = tf.saved_model.load(model_path)
     return model
+
+
+def create_folder(folder_path):
+    # 删除模型
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+
+def remove_folder(folder_path):
+    # 删除模型
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)

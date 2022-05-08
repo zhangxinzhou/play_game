@@ -1,6 +1,10 @@
-max_step = 10
-for step in range(max_step, 120):
-    year = int(step / 12) + 1
-    month = step % 12
-    my_step = (year - 1) * 12 + month
-    print(f"step={step},year={year},month={month},my_step={my_step}")
+import random
+
+arr = [1, 2, 3, 4, 5, 6]
+print(arr)
+
+arr.sort()
+print(arr)
+
+random.shuffle(arr)
+print(arr)

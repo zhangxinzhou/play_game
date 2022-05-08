@@ -1,7 +1,9 @@
 import os
-import time
+import json
 import random
+import copy
 import db_utils
+import game_utils
 
 # 模型根路径
 model_root_path = r"F:\models"
@@ -15,6 +17,17 @@ age_limit = 60
 train_episodes = 200
 # 评估次数
 test_episodes = 12
+# 初始隐藏层
+# 游戏画面
+input_shape = (195, 500, 3)
+# 动作空间
+output_dim = 5
+# 初始隐藏层
+init_hidden_layer = {
+    "mutation_type": "",
+    "convolutional_layer": [],
+    "fully_connected_layer": [1024, 100, 10]
+}
 
 
 # 模型演化主流程
@@ -30,7 +43,10 @@ def model_evolution():
                 "model_id": db_utils.generate_uuid(),
                 "generation_num": 0,
                 "game_name": game_name,
-                "training_status": "init"
+                "training_status": "init",
+                "input_shape": json.dumps(input_shape),
+                "output_dim": output_dim,
+                "hidden_layer": json.dumps(init_hidden_layer)
             }
             db_utils.insert_model_generation(init_model_obj)
 
@@ -51,6 +67,10 @@ def model_evolution():
                 # 训练准备
                 train_id = db_utils.generate_uuid()
                 model_path = os.path.join(model_root_path, game_name, train_id)
+                train_input_shape = json.loads(training_model_obj.get("input_shape"))
+                train_output_dim = training_model_obj.get("output_dim")
+                train_hidden_layer = json.loads(training_model_obj.get("hidden_layer"))
+
                 train_obj = {
                     "train_id": train_id,
                     "model_id": model_id,
@@ -59,6 +79,9 @@ def model_evolution():
                     "generation_num": generation_num,
                     "game_name": game_name,
                     "age_num": age,
+                    "input_shape": json.dumps(train_input_shape),
+                    "output_dim": train_output_dim,
+                    "hidden_layer": json.dumps(train_hidden_layer),
                     "score_total": random.randint(1, 100),
                 }
                 db_utils.insert_model_train_detail(train_obj)
@@ -99,29 +122,22 @@ def model_evolution():
                 if next_generation_count <= env_capacity:
                     # 如果下一代的模型数量达到了环境容量,则繁衍结束
                     # 模型变异,并将模型变异的数据插入数据库
-                    son_model_list = [
-                        {
-                            "model_id": db_utils.generate_uuid(),
-                            "model_parent_id": model_parent_id,
-                            "generation_num": next_generation_num,
-                            "game_name": game_name,
-                            "training_status": "init"
-                        },
-                        {
-                            "model_id": db_utils.generate_uuid(),
-                            "model_parent_id": model_parent_id,
-                            "generation_num": next_generation_num,
-                            "game_name": game_name,
-                            "training_status": "init"
-                        },
-                        {
-                            "model_id": db_utils.generate_uuid(),
-                            "model_parent_id": model_parent_id,
-                            "generation_num": next_generation_num,
-                            "game_name": game_name,
-                            "training_status": "init"
-                        }
-                    ]
+                    son_base_model_obj = {
+                        "model_parent_id": model_parent_id,
+                        "generation_num": next_generation_num,
+                        "game_name": game_name,
+                        "training_status": "init",
+                        "input_shape": finished_model_obj.get("input_shape"),
+                        "output_dim": finished_model_obj.get("output_dim"),
+                    }
+                    father_hidden_layer = json.loads(finished_model_obj.get("hidden_layer"))
+                    mutation_hidden_layer_list = game_utils.hidden_layer_mutation(father_hidden_layer)
+                    son_model_list = []
+                    for son_hidden_layer in mutation_hidden_layer_list:
+                        son_model_obj = copy.deepcopy(son_base_model_obj)
+                        son_model_obj['model_id'] = db_utils.generate_uuid()
+                        son_model_obj['hidden_layer'] = json.dumps(son_hidden_layer)
+                        son_model_list.append(son_model_obj)
                     db_utils.insert_model_generation(son_model_list)
 
 
