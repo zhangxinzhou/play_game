@@ -92,10 +92,7 @@ def model_evolution():
                 # 训练开始
                 db_utils.update_model_train_detail_start_time(train_id)
                 #
-
-                hidden_layer = {}
-                model_path = r"F:\models\dino\_test"
-                agent = game_agent_dino.Agent(env, hidden_layer, model_path)
+                agent = game_agent_dino.Agent(env, train_hidden_layer, model_path)
                 score_total = agent.train(train_episodes=train_episodes, test_episodes=test_episodes)
 
                 # 训练结束
