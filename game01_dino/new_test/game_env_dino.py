@@ -11,9 +11,19 @@ import win32gui
 import sys
 import game_utils
 import pyautogui
+import keyboard
 
 # 延迟时间修改
 pyautogui.PAUSE = 0.0001
+# 停止开关
+stop = False
+
+
+def game_stop(key_event):
+    global stop
+    stop = True
+
+
 # 游戏标题
 game_title = r'chrome://dino/ - Google Chrome'
 # 获取window句柄
@@ -153,6 +163,9 @@ class DinoEnv(GameEnv, ABC):
                 print(
                     f"step_count={step_count}, game_frame.shape={game_frame.shape}, reward={reward}, is_game_over={is_game_over}, time_cost={int(time_cost * 1000)}ms")
                 self.render()
+                if stop:
+                    print("停止游戏")
+                    exit(0)
                 if is_game_over:
                     print("=" * 50, "game over", "=" * 50)
                     # 暂停两秒,因为游戏game over后有两秒时间无法操作

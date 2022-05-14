@@ -221,6 +221,12 @@ def update_model_train_detail_end_time(train_id: str, score_total):
     curs.execute("commit;")
 
 
+def delete_all_data():
+    curs.execute("delete from model_generation;")
+    curs.execute("delete from model_train_detail;")
+    curs.execute("commit;")
+
+
 if __name__ == '__main__':
     # 数据测试
     # model_id = generate_uuid()

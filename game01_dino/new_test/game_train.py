@@ -16,7 +16,7 @@ env_capacity = 100
 # 年龄限制,就是训练多少轮数
 age_limit = 60
 # 训练次数
-train_episodes = 100
+train_episodes = 10
 # 评估次数
 test_episodes = 10
 # 初始隐藏层
@@ -151,4 +151,7 @@ def model_evolution():
 
 
 if __name__ == '__main__':
+    is_init = True
+    if is_init:
+        db_utils.delete_all_data()
     model_evolution()
