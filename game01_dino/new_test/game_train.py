@@ -6,19 +6,20 @@ import db_utils
 import game_utils
 import game_env_dino
 import game_agent_dino
+import config_utils
 
 # 模型根路径
-model_root_path = r"F:\models"
+model_root_path = config_utils.get_config_str("model_params", "model_root_path")
 # 游戏名称
 game_name = "dino"
 # 环境容量-一代模型最大数量
-env_capacity = 100
+env_capacity = config_utils.get_config_int("model_params", "env_capacity")
 # 年龄限制,就是训练多少轮数
-age_limit = 2
+age_limit = config_utils.get_config_int("model_params", "age_limit")
 # 训练次数
-train_episodes = 2
+train_episodes = config_utils.get_config_int("model_params", "train_episodes")
 # 评估次数
-test_episodes = 2
+test_episodes = config_utils.get_config_int("model_params", "test_episodes")
 # 初始隐藏层
 # 游戏画面
 input_shape = (195, 500, 3)
@@ -28,7 +29,7 @@ output_dim = 5
 init_hidden_layer = {
     "mutation_type": "init",
     "convolutional_layer": [],
-    "fully_connected_layer": [1024, 100, 10]
+    "fully_connected_layer": [100, 10]
 }
 # 游戏环境
 env = game_env_dino.DinoEnv()

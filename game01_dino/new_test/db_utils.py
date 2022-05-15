@@ -1,13 +1,14 @@
 import psycopg2
 import uuid
+import config_utils
 
 # 连接数据库需要提供相应的数据库名称、用户名、密码、地址、端口等信息
 
-db = 'postgres'
-user = 'postgres'
-pw = 'postgres'
-host = 'localhost'
-port = '5432'
+db = config_utils.get_config_str('postgres', 'db')
+user = config_utils.get_config_str('postgres', 'user')
+pw = config_utils.get_config_str('postgres', 'pw')
+host = config_utils.get_config_str('postgres', 'host')
+port = config_utils.get_config_str('postgres', 'port')
 
 conn = psycopg2.connect(database=db, user=user, password=pw, host=host, port=port)
 curs = conn.cursor()

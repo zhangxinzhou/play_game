@@ -11,7 +11,6 @@ import win32gui
 import sys
 import game_utils
 import pyautogui
-import keyboard
 
 # 延迟时间修改
 pyautogui.PAUSE = 0.0001
