@@ -63,9 +63,22 @@ def model_mutation():
 
 
 def arr_mutation_rearrange(arr_old):
-    # 随机重排
+    # 随机重排,比如[1,2,3]排列成[2,1,3]
     arr_new = copy.deepcopy(arr_old)
     random.shuffle(arr_new)
+    return arr_new
+
+
+def arr_mutation_merge(arr_old):
+    # 合并,层数减少,如[1,2,3]=>[3,3]或[1,5]
+    arr_new = []
+    index1 = random.randint()
+    return arr_new
+
+
+def arr_mutation_split(arr_old):
+    # 分裂,层数增加,如如[3,4]=>[1,3,3]或[2,2,3]等
+    arr_new = copy.deepcopy(arr_old)
     return arr_new
 
 
@@ -149,3 +162,11 @@ def remove_folder(folder_path):
     # 删除模型
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
+
+
+if __name__ == '__main__':
+    a = [101, 102, 103, 104, 105, 106, 107, 108]
+    length = len(a)
+    b = random.randint(0, length)
+    print(a)
+    print(b)
