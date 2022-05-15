@@ -3,9 +3,9 @@ import uuid
 
 # 连接数据库需要提供相应的数据库名称、用户名、密码、地址、端口等信息
 
-db = 'zxz'
+db = 'postgres'
 user = 'postgres'
-pw = 'admin'
+pw = 'postgres'
 host = 'localhost'
 port = '5432'
 

@@ -14,11 +14,11 @@ game_name = "dino"
 # 环境容量-一代模型最大数量
 env_capacity = 100
 # 年龄限制,就是训练多少轮数
-age_limit = 60
+age_limit = 2
 # 训练次数
-train_episodes = 10
+train_episodes = 2
 # 评估次数
-test_episodes = 10
+test_episodes = 2
 # 初始隐藏层
 # 游戏画面
 input_shape = (195, 500, 3)
@@ -107,7 +107,7 @@ def model_evolution():
             best_score = train_obj_best.get("score_total")
             best_model_path = train_obj_best.get("model_path")
             # 删除best_age之外的模型(如果自己的磁盘空间够,就不需要删除)
-            for index, tmp_obj in enumerate(train_obj_best):
+            for index, tmp_obj in enumerate(train_list):
                 delete_model_path = tmp_obj.get("model_path")
                 if index >= 1:
                     game_utils.remove_folder(delete_model_path)
