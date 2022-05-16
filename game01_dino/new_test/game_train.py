@@ -152,7 +152,7 @@ def model_evolution():
 
 
 if __name__ == '__main__':
-    is_init = True
+    is_init = config_utils.get_config_bool("model_params", "is_init")
     if is_init:
         db_utils.delete_all_data()
     model_evolution()
