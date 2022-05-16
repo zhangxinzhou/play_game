@@ -138,6 +138,16 @@ def hidden_layer_mutation(hidden_layer: dict):
             "fully_connected_layer": copy.deepcopy(fully_connected_layer)
         },
         {
+            "mutation_type": "mutations_merge",
+            "convolutional_layer": convolutional_layer,
+            "fully_connected_layer": arr_mutation_merge(fully_connected_layer)
+        },
+        {
+            "mutation_type": "mutations_split",
+            "convolutional_layer": convolutional_layer,
+            "fully_connected_layer": arr_mutation_split(fully_connected_layer)
+        },
+        {
             "mutation_type": "mutations_rearrange",
             "convolutional_layer": convolutional_layer,
             "fully_connected_layer": arr_mutation_rearrange(fully_connected_layer)
