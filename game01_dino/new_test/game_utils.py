@@ -62,27 +62,46 @@ def model_mutation():
     pass
 
 
-def arr_mutation_rearrange(arr_old):
+def arr_mutation_rearrange(arr_old: list):
     # 随机重排,比如[1,2,3]排列成[2,1,3]
     arr_new = copy.deepcopy(arr_old)
     random.shuffle(arr_new)
     return arr_new
 
 
-def arr_mutation_merge(arr_old):
+def arr_mutation_merge(arr_old: list):
     # 合并,层数减少,如[1,2,3]=>[3,3]或[1,5]
-    arr_new = []
-    index1 = random.randint()
+    arr_new = copy.deepcopy(arr_old)
+    length = len(arr_new)
+    if length <= 1:
+        return arr_new
+    index1, index2 = random.sample(range(0, length), 2)
+    arr_new[index1] = arr_new[index1] + arr_new[index2]
+    del arr_new[index2]
     return arr_new
 
 
-def arr_mutation_split(arr_old):
+def arr_mutation_split(arr_old: list):
     # 分裂,层数增加,如如[3,4]=>[1,3,3]或[2,2,3]等
     arr_new = copy.deepcopy(arr_old)
+    index_arr = []
+    for i, val in enumerate(arr_new):
+        if val > 1:
+            index_arr.append(i)
+    if len(index_arr) <= 0:
+        # 数组中没有可以分裂的
+        return arr_new
+    index_random = random.sample(index_arr, 1)[0]
+    val0 = arr_new[index_random]
+    val1 = random.randint(1, val0 - 1)
+    val2 = val0 - val1
+    del arr_new[index_random]
+    arr_new.insert(index_random, val2)
+    arr_new.insert(index_random, val1)
     return arr_new
 
 
-def arr_mutation_increase(arr_old):
+def arr_mutation_increase(arr_old: list):
     arr_new = copy.deepcopy(arr_old)
 
     length = len(arr_new)
@@ -94,7 +113,7 @@ def arr_mutation_increase(arr_old):
     return arr_new
 
 
-def arr_mutation_decrease(arr_old):
+def arr_mutation_decrease(arr_old: list):
     arr_new = copy.deepcopy(arr_old)
 
     length = len(arr_new)
@@ -165,8 +184,10 @@ def remove_folder(folder_path):
 
 
 if __name__ == '__main__':
-    a = [101, 102, 103, 104, 105, 106, 107, 108]
-    length = len(a)
-    b = random.randint(0, length)
+    a = [100, 101, 102, 103, 104, 105, 106, 107, 108]
+    a = [1, 2, 3]
     print(a)
+    b = arr_mutation_merge(a)
+    c = arr_mutation_split(a)
     print(b)
+    print(c)
