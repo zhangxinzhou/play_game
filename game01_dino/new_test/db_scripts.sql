@@ -22,7 +22,8 @@ CREATE TABLE public.model_generation (
 	created_by varchar NULL DEFAULT 'system'::character varying, -- 创建人
 	created_date timestamp NULL DEFAULT now(), -- 创建时间
 	updated_by varchar NULL DEFAULT 'system'::character varying, -- 更新人
-	updated_date timestamp NULL DEFAULT now() -- 更新时间
+	updated_date timestamp NULL DEFAULT now(), -- 更新时间
+	train_info varchar NULL -- 训练信息(json字符串)
 );
 COMMENT ON TABLE public.model_generation IS '模型世代表';
 
@@ -46,6 +47,7 @@ COMMENT ON COLUMN public.model_generation.created_by IS '创建人';
 COMMENT ON COLUMN public.model_generation.created_date IS '创建时间';
 COMMENT ON COLUMN public.model_generation.updated_by IS '更新人';
 COMMENT ON COLUMN public.model_generation.updated_date IS '更新时间';
+COMMENT ON COLUMN public.model_generation.train_info IS '训练信息(json字符串)';
 
 
 -- public.model_train_detail definition

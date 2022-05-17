@@ -179,7 +179,7 @@ def update_model_generation_start_time(model_id: str):
     curs.execute("commit;")
 
 
-def update_model_generation_end_time(model_id: str, model_path: str, best_age, best_score):
+def update_model_generation_end_time(model_id: str, model_path: str, best_age, best_score, train_info):
     sql = f'''
         update model_generation 
         set 
@@ -189,6 +189,7 @@ def update_model_generation_end_time(model_id: str, model_path: str, best_age, b
         model_path = '{model_path}',
         best_age = {best_age},
         best_score = {best_score},
+        train_info = '{train_info}',
         updated_date = now()
         where model_id = '{model_id}'
     '''
