@@ -9,6 +9,7 @@ CREATE TABLE public.model_generation (
 	model_parent_id varchar NULL, -- 父模型id
 	model_path varchar NULL, -- 模型路径
 	generation_num int8 NULL, -- 世代(第几代)
+	train_info varchar NULL, -- 训练信息(json字符串)
 	best_age int8 NULL, -- 表现最好的年龄
 	best_score numeric NULL, -- 分数中位数
 	input_shape varchar NULL, -- 输入形状(游戏图像的形状)
@@ -22,8 +23,7 @@ CREATE TABLE public.model_generation (
 	created_by varchar NULL DEFAULT 'system'::character varying, -- 创建人
 	created_date timestamp NULL DEFAULT now(), -- 创建时间
 	updated_by varchar NULL DEFAULT 'system'::character varying, -- 更新人
-	updated_date timestamp NULL DEFAULT now(), -- 更新时间
-	train_info varchar NULL -- 训练信息(json字符串)
+	updated_date timestamp NULL DEFAULT now() -- 更新时间
 );
 COMMENT ON TABLE public.model_generation IS '模型世代表';
 
@@ -33,6 +33,7 @@ COMMENT ON COLUMN public.model_generation.model_id IS '模型id';
 COMMENT ON COLUMN public.model_generation.model_parent_id IS '父模型id';
 COMMENT ON COLUMN public.model_generation.model_path IS '模型路径';
 COMMENT ON COLUMN public.model_generation.generation_num IS '世代(第几代)';
+COMMENT ON COLUMN public.model_generation.train_info IS '训练信息(json字符串)';
 COMMENT ON COLUMN public.model_generation.best_age IS '表现最好的年龄';
 COMMENT ON COLUMN public.model_generation.best_score IS '分数中位数';
 COMMENT ON COLUMN public.model_generation.input_shape IS '输入形状(游戏图像的形状)';
@@ -47,7 +48,6 @@ COMMENT ON COLUMN public.model_generation.created_by IS '创建人';
 COMMENT ON COLUMN public.model_generation.created_date IS '创建时间';
 COMMENT ON COLUMN public.model_generation.updated_by IS '更新人';
 COMMENT ON COLUMN public.model_generation.updated_date IS '更新时间';
-COMMENT ON COLUMN public.model_generation.train_info IS '训练信息(json字符串)';
 
 
 -- public.model_train_detail definition
@@ -67,7 +67,7 @@ CREATE TABLE public.model_train_detail (
 	output_dim varchar NULL, -- 输出维度(动作空间)
 	hidden_layer varchar NULL, -- 隐藏层(json),包含卷积层和全连接层
 	game_name varchar NULL, -- 游戏名称
-	score_total varchar NULL, -- 一局游戏分数
+	score_total numeric NULL, -- 一局游戏分数
 	training_start_date timestamp NULL, -- 训练开始时间
 	training_end_date timestamp NULL, -- 训练结束时间
 	training_cost_time interval NULL, -- 训练花费时间

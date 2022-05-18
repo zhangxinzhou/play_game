@@ -114,7 +114,7 @@ def model_evolution():
                     game_utils.remove_folder(delete_model_path)
 
             # 训练信息
-            train_info_list = [{"age": item["age_num"], "score": item["score_total"]} for item in train_list]
+            train_info_list = [{"age": item["age_num"], "score": float(item["score_total"])} for item in train_list]
             train_info_str = json.dumps(train_info_list)
             # 模型表更新状态为已完成,更新训练花费时间
             db_utils.update_model_generation_end_time(model_id, best_model_path, best_age, best_score, train_info_str)
