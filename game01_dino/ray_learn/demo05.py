@@ -29,6 +29,7 @@ class MyEnv(gym.Env):
         done = self.cur_pos >= self.end_pos
         # Produce a random reward when we reach the goal
         print("aaa")
+        print("bbb")
         return [self.cur_pos], random.random() * 2 if done else -0.1, done, {}
 
 
