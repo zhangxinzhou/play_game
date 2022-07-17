@@ -43,3 +43,5 @@ trainer = ppo.PPOTrainer(
 
 while True:
     print(trainer.train())
+    
+    print('abc')
