@@ -23,13 +23,11 @@ class MyEnv(gym.Env):
     def step(self, action):
         assert action in [0, 1], action
         if action == 0 and self.cur_pos > 0:
-            self.cur_pos = 1;
+            self.cur_pos = 1
         elif action == 1:
             self.cur_pos += 1
         done = self.cur_pos >= self.end_pos
         # Produce a random reward when we reach the goal
-        print("aaa")
-        print("bbb")
         return [self.cur_pos], random.random() * 2 if done else -0.1, done, {}
 
 
@@ -45,5 +43,5 @@ trainer = ppo.PPOTrainer(
 
 while True:
     print(trainer.train())
-    
+
     print('abc')
