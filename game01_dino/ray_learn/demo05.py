@@ -1,24 +1,43 @@
+import random
+
+import numpy as np
 import gym, ray
+from gym.spaces import Discrete, Box
+from ray.rllib.env.env_context import EnvContext
 from ray.rllib.agents import ppo
 
 
 class MyEnv(gym.Env):
-    def __init__(self, env_config):
-        self.action_space = gym.Space()
-        self.observation_space = gym.Space()
+
+    def __init__(self, env_config: EnvContext):
+        self.end_pos = env_config['corridor_length']
+        self.cur_pos = 0
+        self.action_space = Discrete(2)
+        self.observation_space = Box(0.0, self.end_pos, shape=(1,), dtype=np.float32)
+        # set the seed, This is only used for the final (reach goal) reward.
 
     def reset(self):
-        return 1
+        self.cur_pos = 0
+        return [self.cur_pos]
 
     def step(self, action):
-        return 1, 1, False, {}
+        assert action in [0, 1], action
+        if action == 0 and self.cur_pos > 0:
+            self.cur_pos = 1;
+        elif action == 1:
+            self.cur_pos += 1
+        done = self.cur_pos >= self.end_pos
+        # Produce a random reward when we reach the goal
+        return [self.cur_pos], random.random() * 2 if done else -0.1, done, {}
 
 
 ray.init()
 trainer = ppo.PPOTrainer(
-    env='CartPole-v0',
+    env=MyEnv,
     config={
-        "env_config": {}
+        "env_config": {
+            "corridor_length": 5
+        }
     }
 )
 
