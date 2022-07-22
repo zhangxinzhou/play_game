@@ -1,10 +1,17 @@
-import random
-import numpy as np
+from demo06 import MyEnv1
 
-action = 0
+import ray
+from ray.rllib.agents import ppo
 
-x = int(sum([1.0]))
-print(x)
+ray.init()
+trainer = ppo.PPOTrainer(
+    env=MyEnv1,
+    config={
+        "env_config": {
+            "corridor_length": 5
+        }
+    }
+)
 
-y = int(sum(np.array([0.0])))
-print(y)
+while True:
+    print(trainer.train())
