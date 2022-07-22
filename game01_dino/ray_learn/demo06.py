@@ -9,22 +9,24 @@ class MyEnv1(gym.Env):
     def __init__(self, config: dict):
         self.action_space = Discrete(n=2)
         self.observation_space = Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32)
-        self.prev_observation = np.array([0])
         self.count = 0
+        self.correct_action = 0
 
     def reset(self):
-        observation: object = np.array([0])
-        self.prev_observation = observation
+        reset_value = 0
+        observation: object = np.array([reset_value])
         self.count = 0
+        self.correct_action = reset_value
         return observation
 
     def step(self, action):
-        observation = np.array([float(random.randint(0, 1))])
-        reward: float = 1.0 if action == int(sum(self.prev_observation)) else 0.0
+        step_value = random.randint(0, 1)
+        observation = np.array([float(step_value)])
+        reward: float = 1.0 if action == self.correct_action else 0.0
         done: bool = self.count >= 100
         info: dict = {}
-        self.prev_observation = observation
         self.count += 1
+        self.correct_action = step_value
         return observation, reward, done, info
 
     def render(self, mode="human"):
