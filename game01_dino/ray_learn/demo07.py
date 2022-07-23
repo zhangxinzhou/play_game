@@ -13,5 +13,10 @@ trainer = ppo.PPOTrainer(
     }
 )
 
-while True:
-    print(trainer.train())
+for i in range(10):
+    tmp = trainer.train()
+    print(i)
+    print(tmp)
+
+print("*" * 100)
+ray.shutdown()
