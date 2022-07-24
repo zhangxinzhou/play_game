@@ -26,7 +26,7 @@ class MyEnv1(gym.Env):
         step_value = random.randint(0, 1)
         observation = np.array([float(step_value)])
         reward: float = 1.0 if action == self.correct_action else 0.0
-        done: bool = self.count >= 10
+        done: bool = self.count >= 100
         info: dict = {}
         self.count += 1
         self.correct_action = step_value

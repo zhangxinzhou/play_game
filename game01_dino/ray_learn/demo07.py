@@ -5,22 +5,18 @@ from ray.rllib.agents import ppo
 
 ray.init()
 ppo_config = ppo.DEFAULT_CONFIG.copy()
-ppo_config['model']['fcnet_hiddens'] = [10, 10]
-trainer = ppo.PPOTrainer(env=MyEnv1, config=ppo_config)
-
+env = MyEnv1()
 for i in range(10):
-    tmp = trainer.train()
-    print(i)
-    print(tmp)
+    ppo_config['model']['fcnet_hiddens'] = [1]
+    trainer = ppo.PPOTrainer(env=MyEnv1, config=ppo_config)
+    trainer_result = trainer.train()
+    print("*" * 50, i, "*" * 50)
 
     episode_reward = 0
     done = False
-    test_env = MyEnv1()
-    obs = test_env.reset()
+    obs = env.reset()
     while not done:
         action = trainer.compute_single_action(obs)
-        obs, reward, done, info = test_env.step(action)
+        obs, reward, done, info = env.step(action)
         episode_reward += reward
     print(episode_reward)
-
-print("*" * 100)
