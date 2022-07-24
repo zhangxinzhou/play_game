@@ -10,12 +10,13 @@ trainer = ppo.PPOTrainer(config=config, env="CartPole-v0")
 
 # Can optionally call trainer.restore(path) to load a checkpoint.
 
-for i in range(1000):
+for i in range(5):
     # Perform one iteration of training the policy with PPO
     result = trainer.train()
+    print("*" * 100, i, "*" * 100)
     print(pretty_print(result))
 
-    if i % 100 == 0:
+    if i % 5 == 0:
         checkpoint = trainer.save()
         print("checkpoint saved at", checkpoint)
 
