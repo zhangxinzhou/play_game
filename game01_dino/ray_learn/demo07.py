@@ -8,10 +8,11 @@ ppo_config = ppo.DEFAULT_CONFIG.copy()
 ppo_config['model']['fcnet_hiddens'] = [256, 256]
 trainer = ppo.PPOTrainer(env=MyEnv1, config=ppo_config)
 env = MyEnv1()
-for i in range(100):
+for i in range(30):
 
     trainer_result = trainer.train()
     print("*" * 50, i, "*" * 50)
+    print(trainer_result)
 
     episode_reward = 0
     done = False
