@@ -5,10 +5,11 @@ from ray.rllib.agents import ppo
 
 ray.init()
 ppo_config = ppo.DEFAULT_CONFIG.copy()
+ppo_config['model']['fcnet_hiddens'] = [256, 256]
+trainer = ppo.PPOTrainer(env=MyEnv1, config=ppo_config)
 env = MyEnv1()
-for i in range(10):
-    ppo_config['model']['fcnet_hiddens'] = [1]
-    trainer = ppo.PPOTrainer(env=MyEnv1, config=ppo_config)
+for i in range(100):
+
     trainer_result = trainer.train()
     print("*" * 50, i, "*" * 50)
 
