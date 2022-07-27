@@ -11,6 +11,7 @@ ray.init()
 ppo_config = ppo.DEFAULT_CONFIG.copy()
 env_name = 'MyEnv1'
 for i in range(3):
+    era_time_start = time.time()
     ppo_config['model']['fcnet_hiddens'] = [256, 256]
     trainer = ppo.PPOTrainer(env=MyEnv1, config=ppo_config)
     model_name = 'aaa' + str(i)
@@ -33,6 +34,7 @@ for i in range(3):
             checkpoint_path_best = checkpoint_path
         # age结束时间
         age_time_end = time.time()
+        age_time_cost = age_time_end - age_time_start
         # age数据保存
         # save_model_age
 
@@ -49,4 +51,6 @@ for i in range(3):
 
     # 保存数据,进行下一个模型结构的迭代
     # model_save
+    era_time_end = time.time()
+    era_time_cost = era_time_end - era_time_start
     pass
