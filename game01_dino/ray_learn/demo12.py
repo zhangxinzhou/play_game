@@ -43,23 +43,21 @@ def fetchall_to_list(rows, description: tuple) -> list:
         return obj_list
 
 
-def query_one_by_sql(sql: str) -> dict:
-    curs.execute(sql)
+def query_one_by_sql(sql_: str) -> dict:
+    curs.execute(sql_)
     row = curs.fetchone()
     description = curs.description
     return fetchone_to_dict(row, description)
 
 
-def query_list_by_sql(sql: str) -> list:
-    curs.execute(sql)
+def query_list_by_sql(sql_: str) -> list:
+    curs.execute(sql_)
     rows = curs.fetchall()
     description = curs.description
     return fetchall_to_list(rows, description)
 
 
 def get_model_era() -> dict:
-    sql = "select * from "
-    curs.execute(sql)
     return 0
 
 
