@@ -75,11 +75,14 @@ def get_model_era(env_name, input_shape, output_dim) -> dict:
     model_count = obj1.get("total", 0)
     if model_count == 0:
         # 一个模型都没有,需要初始化一个模型
-        sql2 = fr"INSERT INTO model_era (model_id, era_num, env_name, input_shape, output_dim, hidden_layer)" \
-               fr"VALUES('{generate_uuid()}', 0, '{env_name}', {input_shape}, {output_dim}, '[10,10]')"
+        sql2 = fr"INSERT INTO model_era " \
+               fr"(model_id, era_num, env_name, input_shape, output_dim, hidden_layer, training_status) " \
+               fr"VALUES " \
+               fr"('{generate_uuid()}', 0, '{env_name}', {input_shape}, {output_dim}, '[10,10]', 'todo')"
         curs.execute(sql2)
 
-    # 查询模型
+    # 查询待训练模型
+
     curs.execute("commit;")
     return 0
 
