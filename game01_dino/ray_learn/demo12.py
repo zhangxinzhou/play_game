@@ -57,10 +57,6 @@ def query_list_by_sql(sql_: str) -> list:
     return fetchall_to_list(rows, description)
 
 
-def get_model_era() -> dict:
-    return 0
-
-
 def add_model_era(model_era: dict) -> None:
     print("aaa")
     # 提交事务
@@ -73,8 +69,20 @@ def add_model_age(model_age_dict) -> None:
     curs.execute("commit;")
 
 
+def get_model_era(env_name, input_shape, output_dim) -> dict:
+    sql1 = fr"select count(*) total from model_era where env_name = '{env_name}'"
+    obj1 = query_one_by_sql(sql1)
+    model_count = obj1.get("total", 0)
+    if model_count == 0:
+        # 一个模型都没有,需要初始化一个模型
+        sql2 = fr"INSERT INTO model_era (model_id, era_num, env_name, input_shape, output_dim, hidden_layer)" \
+               fr"VALUES('{generate_uuid()}', 0, '{env_name}', {input_shape}, {output_dim}, '[10,10]')"
+        curs.execute(sql2)
+
+    # 查询模型
+    curs.execute("commit;")
+    return 0
+
+
 if __name__ == '__main__':
-    sql = "select count(*) total from model_era"
-    obj = query_one_by_sql(sql)
-    total = obj.get("total", 0)
-    print(total)
+    get_model_era('MyDev1', 10, 10)
