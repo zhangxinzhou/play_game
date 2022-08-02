@@ -1,15 +1,16 @@
-from sqlalchemy import Column, Integer, VARCHAR, create_engine
+from sqlalchemy import Table, Column, Integer, VARCHAR, create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 Base = declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'users1'
-    id = Column(Integer, primary_key=True)
-    name = Column(VARCHAR(256), nullable=False)
-    age = Column(Integer)
-    place = Column(VARCHAR(256), nullable=False)
+    __tablename__ = "user"
+    __table_args__ = ({"comment": "user表"})
+    id = Column(Integer, primary_key=True, comment="ID")
+    name = Column(VARCHAR, nullable=False, comment="姓名")
+    age = Column(Integer, comment="年龄")
+    place = Column(VARCHAR, nullable=False, comment="位置")
 
     def __init__(self, id, name, age, place):
         self.id = id
