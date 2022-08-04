@@ -6,6 +6,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
 import uuid
 import time
+import json
 
 Base = declarative_base()
 
@@ -37,6 +38,26 @@ class ModelEra(Base):
     created_date = Column(TIMESTAMP, comment="创建时间", server_default=text("NOW()"))
     updated_by = Column(VARCHAR, comment="更新人", server_default="system")
     updated_date = Column(TIMESTAMP, comment="更新时间", server_default=text("NOW()"))
+
+    def __str__(self):
+        line0 = ""
+        line1 = ""
+        line2 = ""
+        for key, val in self.__dict__.items():
+            if not str(key).startswith("_"):
+                tmp1 = str(key)
+                tmp2 = str(val)
+                len1 = len(tmp1)
+                len2 = len(tmp2)
+                diff = abs(len1 - len2)
+                line0 += "-" * (max(len1, len2) + 1)
+                if len1 > len2:
+                    line1 += tmp1 + "|"
+                    line2 += tmp2 + " " * diff + "|"
+                else:
+                    line1 += tmp1 + " " * diff + "|"
+                    line2 += tmp2 + "|"
+        return "\n".join([line0, line1, line2, line0])
 
 
 class ModelAge(Base):
@@ -96,7 +117,7 @@ def get_model_era():
     session = get_session()
 
 
-if __name__ == '__main__':
+def db_test():
     init_db()
 
     start = datetime.now()
@@ -120,5 +141,29 @@ if __name__ == '__main__':
         print(type(result))
 
     # 释放资源
+    session.commit()
+    session.close()
+
+
+if __name__ == '__main__':
+    # 建表
+    init_db()
+    # 常量定义
+    env_name = "env_name"
+    input_shape = 1
+    output_shape = 1
+    session = get_session()
+    for i in range(100):
+        era_count = session.query(func.count(ModelEra.model_id)).scalar()
+        # 如果era一条数据都没有，则初始化一个模型
+        if era_count == 0:
+            era_init_obj = ModelEra(model_id=get_uuid(), era_num=0, input_shape=input_shape, output_shape=output_shape,
+                                    hidden_layer="[10,10]", env_name=env_name, training_status="todo")
+            session.add(era_init_obj)
+
+        # 取出待训练的模型
+        era_todo = session.query(ModelEra).filter_by(training_status="todo").one()
+        print(era_todo)
+
     session.commit()
     session.close()
