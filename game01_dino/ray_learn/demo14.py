@@ -209,6 +209,7 @@ if __name__ == '__main__':
         else:
             # 所有待训练的模型已经训练完毕,因此繁衍下一代模型
             era_max = session.query(func.max(ModelEra.era_num)).filter_by(train_status="done").scalar()
+            era_next_num = era_max + 1
             # 取出最近一代已训练完成的全部模型的
             era_list = session.query(ModelEra).filter_by(era_num=era_max).order_by(ModelEra.reward.desc()).all()
             for index, era_tmp in enumerate(era_list):
@@ -221,20 +222,18 @@ if __name__ == '__main__':
                 era_list = session.query(ModelEra).filter_by(era_num=era_max).order_by(
                     ModelEra.rank.desc()).all()
 
-            era_next_count = 0
             for index, era_tmp in enumerate(era_list):
                 hidden_layer = json.loads(era_tmp.hidden_layer)
                 hidden_layer_mutation_list = game_utils.hidden_layer_mutation(hidden_layer)
                 for hidden_layer_mutation in hidden_layer_mutation_list:
                     era_next_obj = ModelEra(model_id=get_uuid(), model_parent_id=era_tmp.model_id,
-                                            era_num=era_max + 1, input_shape=input_shape, output_shape=output_shape,
+                                            era_num=era_next_num, input_shape=input_shape, output_shape=output_shape,
                                             hidden_layer=json.dumps(hidden_layer_mutation), env_name=env_name,
                                             train_status="todo")
                     session.add(era_next_obj)
-                    era_next_count += 1
                 # 环境承载能力,下一代最多有一百个
-                if era_next_count >= env_capacity:
+                era_next_count = session.query(func.max(ModelEra.era_num)).filter_by(era_num=era_next_num).scalar()
+                if index >= env_capacity:
                     break
-
-    # 提交事务
-    session.commit()
+        # 提交事务
+        session.commit()
