@@ -164,8 +164,8 @@ if __name__ == '__main__':
     }
 
     # 删除数据
-    # session.query(ModelEra).delete()
-    # session.query(ModelAge).delete()
+    session.query(ModelEra).delete()
+    session.query(ModelAge).delete()
     for i in range(100):
         era_count = session.query(func.count(ModelEra.model_id)).scalar()
         # 如果era一条数据都没有，则初始化一个模型
@@ -213,8 +213,7 @@ if __name__ == '__main__':
             era_list = session.query(ModelEra).filter_by(era_num=era_max).order_by(ModelEra.reward.desc()).all()
             for index, era_tmp in enumerate(era_list):
                 # 更新最近一代模型的排名
-                era_tmp: ModelEra.rank = index + 1
-
+                era_tmp.rank = index + 1
             # 优先获取合格的(passed=Y)模型,如果没有合格的,则获取全部的模型,排个序,优秀的模型繁衍下一代
             era_list = session.query(ModelEra).filter_by(era_num=era_max, passed='Y').order_by(
                 ModelEra.rank.desc()).all()
