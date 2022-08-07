@@ -93,7 +93,7 @@ def get_engine():
     return create_engine(
         url="postgresql+psycopg2://postgres:postgres@localhost:5432/postgres",
         encoding="utf-8",
-        echo=True
+        echo=False
     )
 
 
@@ -164,8 +164,8 @@ if __name__ == '__main__':
     }
 
     # 删除数据
-    session.query(ModelEra).delete()
-    session.query(ModelAge).delete()
+    # session.query(ModelEra).delete()
+    # session.query(ModelAge).delete()
     for i in range(100):
         era_count = session.query(func.count(ModelEra.model_id)).scalar()
         # 如果era一条数据都没有，则初始化一个模型
@@ -232,8 +232,8 @@ if __name__ == '__main__':
                                             train_status="todo")
                     session.add(era_next_obj)
                 # 环境承载能力,下一代最多有一百个
-                era_next_count = session.query(func.max(ModelEra.era_num)).filter_by(era_num=era_next_num).scalar()
-                if index >= env_capacity:
+                era_next_count = session.query(func.count(ModelEra.model_id)).filter_by(era_num=era_next_num).scalar()
+                if era_next_count >= env_capacity:
                     break
         # 提交事务
         session.commit()
