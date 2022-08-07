@@ -75,18 +75,17 @@ class ModelAge(Base):
     # 表字段信息
     model_age_id = Column(VARCHAR, primary_key=True, comment="年龄id(训练迭代次数)")
     model_id = Column(VARCHAR, comment="模型id")
-    model_parent_id = Column(VARCHAR, comment="父模型id")
     checkpoint_path = Column(VARCHAR, comment="模型路径")
     era_num = Column(BIGINT, comment="世代")
     age_num = Column(BIGINT, comment="年龄")
-    input_shape = Column(VARCHAR, comment="输入形状(游戏图像的形状)")
-    output_shape = Column(VARCHAR, comment="输出维度(动作空间)")
-    hidden_layer = Column(TEXT, comment="隐藏层(json),包含卷积层和全连接层")
-    env_name = Column(VARCHAR, comment="环境名称")
     train_start_date = Column(TIMESTAMP, comment="训练开始时间")
     train_end_date = Column(TIMESTAMP, comment="训练结束时间")
     train_cost_time = Column(Interval, comment="训练花费时间")
     train_seq = Column(BIGINT, comment="顺序")
+    episode_reward_max = Column(NUMERIC, comment="最大奖励")
+    episode_reward_min = Column(NUMERIC, comment="最小奖励")
+    episode_reward_mean = Column(NUMERIC, comment="平均奖励")
+    agent_timesteps_total = Column(NUMERIC, comment="时间")
     created_by = Column(VARCHAR, comment="创建人", server_default="system")
     created_date = Column(TIMESTAMP, comment="创建时间", server_default=text("NOW()"))
     updated_by = Column(VARCHAR, comment="更新人", server_default="system")
@@ -175,9 +174,11 @@ while True:
                 checkpoint_path_best = checkpoint_path
             age_end = datetime.now()
             age_cost = age_end - age_start
-            age_obj = ModelAge(model_age_id=get_uuid(), model_id=era_todo.model_id, train_seq=train_seq,
-                               train_start_date=age_start, train_end_date=age_end,
-                               train_cost_time=age_cost)
+            age_obj = ModelAge(model_age_id=get_uuid(), model_id=era_todo.model_id, checkpoint_path=checkpoint_path,
+                               train_seq=train_seq, era_num=era_todo.era_num, age_num=age,
+                               train_start_date=age_start, train_end_date=age_end, train_cost_time=age_cost,
+                               episode_reward_max=episode_reward_max, episode_reward_min=episode_reward_min,
+                               episode_reward_mean=episode_reward_mean, agent_timesteps_total=agent_timesteps_total)
             session.add(age_obj)
 
         reward = episode_reward_mean
@@ -235,6 +236,3 @@ while True:
             era_next_count = session.query(func.count(ModelEra.model_id)).filter_by(era_num=era_next_num).scalar()
             if era_next_count >= env_capacity:
                 break
-
-    # 提交事务
-    session.commit()
