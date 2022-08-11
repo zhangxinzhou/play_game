@@ -1,7 +1,6 @@
 import ray
 from ray import tune
 from ray.rllib.agents import ppo
-from ray.tune.logger import pretty_print
 
 from demo06 import MyEnv1
 
@@ -15,12 +14,15 @@ analysis = tune.run(
     name="my_name",
     # 停止条件
     stop={
-        "training_iteration": 10
+        "training_iteration": 2
     },
     config={
         "env": MyEnv1,
         "num_gpus": 0,
         "num_workers": 1,
+        "model": {
+            "fcnet_hiddens": [10, 10]
+        },
         # "lr": tune.grid_search([0.01, 0.001, 0.0001])
     },
     # 同时运行两个实验
@@ -38,7 +40,11 @@ print("=" * 100)
 print("best_checkpoint")
 print(best_checkpoint)
 
-agent = ppo.PPOTrainer(config={}, env=MyEnv1)
+agent = ppo.PPOTrainer(config={
+    "model": {
+        "fcnet_hiddens": [10, 10]
+    }
+}, env=MyEnv1)
 agent.restore(checkpoint_path=best_checkpoint)
 
 env = MyEnv1()
