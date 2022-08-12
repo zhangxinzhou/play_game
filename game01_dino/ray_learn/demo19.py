@@ -31,14 +31,21 @@ analysis = tune.run(
     checkpoint_at_end=True
 )
 
-best_checkpoint = analysis.get_best_checkpoint(
-    trial=analysis.get_best_trial("episode_reward_mean", mode="max"),
-    metric="episode_reward_mean",
-    mode="max")
+analysis.default_metric = "episode_reward_mean"
+analysis.default_mode = "max"
 
-print("=" * 100)
-print("best_checkpoint")
+print("*" * 100)
+best_checkpoint = analysis.best_checkpoint
+best_result = analysis.best_result
+print(type(best_checkpoint))
 print(best_checkpoint)
+for key, val in best_result.items():
+    print(key, "=", val)
+print("*" * 100)
+print(best_result.get("episode_reward_max"))
+print(best_result.get("episode_reward_min"))
+print(best_result.get("episode_reward_mean"))
+print(best_result.get("episode_len_mean"))
 
 agent = ppo.PPOTrainer(config={
     "model": {
