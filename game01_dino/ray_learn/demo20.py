@@ -160,14 +160,17 @@ while True:
         model_todo.episode_len_mean = episode_len_mean
         model_todo.passed = 'Y' if episode_reward_rate > 0.9 else 'N'
         model_todo.reward = episode_reward_mean
-        model_todo.cost = sum(fcnet_hiddens)
+        cost = 1
+        for num in fcnet_hiddens:
+            cost * num
+        model_todo.cost = cost
     else:
         # 所有待训练的模型已经训练完毕,因此繁衍下一代模型
         iteration_max = session.query(func.max(ModelIteration.iteration_num)).filter_by(train_status="done").scalar()
         iteration_next_num = iteration_max + 1
         # 取出最近一代已训练完成的全部模型的
         iteration_list = session.query(ModelIteration).filter_by(iteration_num=iteration_max).order_by(
-            ModelIteration.reward.desc()).all()
+            ModelIteration.reward.desc(), ModelIteration.cost.asc()).all()
         for index, model_tmp in enumerate(iteration_list):
             # 更新最近一代模型的排名
             model_tmp.rank = index + 1
@@ -180,8 +183,8 @@ while True:
 
         for index, model_tmp in enumerate(iteration_list):
             fcnet_hiddens_old = json.loads(model_tmp.fcnet_hiddens)
-            fcnet_hiddens_mutation_list = list_mutation.list_mutation(fcnet_hiddens_old)
-            for fcnet_hiddens_new in fcnet_hiddens_mutation_list:
+            fcnet_hiddens_new_list = list_mutation.list_mutation(fcnet_hiddens_old)
+            for fcnet_hiddens_new in fcnet_hiddens_new_list:
                 model_next_obj = ModelIteration(model_id=get_uuid(), model_parent_id=model_tmp.model_id,
                                                 iteration_num=iteration_next_num,
                                                 fcnet_hiddens=json.dumps(fcnet_hiddens_new), env_name=env_name,
