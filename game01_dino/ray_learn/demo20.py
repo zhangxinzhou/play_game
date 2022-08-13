@@ -172,7 +172,7 @@ while True:
         iteration_list = session.query(ModelIteration).filter_by(iteration_num=iteration_max).order_by(
             ModelIteration.reward.desc(), ModelIteration.cost.asc()).all()
         for index, model_tmp in enumerate(iteration_list):
-            # 更新最近一代模型的排名
+            # 更新最近一代模型的排名(评分高,成本低)
             model_tmp.rank = index + 1
         # 优先获取合格的(passed=Y)模型,如果没有合格的,则获取全部的模型,排个序,优秀的模型繁衍下一代
         iteration_list = session.query(ModelIteration).filter_by(iteration_num=iteration_max, passed='Y').order_by(
