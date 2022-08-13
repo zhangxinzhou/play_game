@@ -12,6 +12,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
 import uuid
 import json
+import gc
 
 from demo06 import MyEnv1
 import list_mutation
@@ -87,6 +88,7 @@ if is_delete_all:
     session.commit()
 
 while True:
+    gc.collect()
     model_count = session.query(func.count(ModelIteration.model_id)).scalar()
     # 如果era一条数据都没有，则初始化一个模型
     if model_count == 0:
