@@ -49,6 +49,26 @@ class ModelIteration(Base):
     updated_by = Column(VARCHAR, comment="更新人", server_default="system")
     updated_date = Column(TIMESTAMP, comment="更新时间", server_default=text("NOW()"))
 
+    def __str__(self):
+        line0 = ""
+        line1 = ""
+        line2 = ""
+        for key, val in self.__dict__.items():
+            if not str(key).startswith("_"):
+                tmp1 = str(key)
+                tmp2 = str(val)
+                len1 = len(tmp1)
+                len2 = len(tmp2)
+                diff = abs(len1 - len2)
+                line0 += "-" * (max(len1, len2) + 1)
+                if len1 > len2:
+                    line1 += tmp1 + "|"
+                    line2 += tmp2 + " " * diff + "|"
+                else:
+                    line1 += tmp1 + " " * diff + "|"
+                    line2 += tmp2 + "|"
+        return "\n".join([line0, line1, line2, line0])
+
 
 engine = create_engine(
     url="postgresql+psycopg2://postgres:postgres@localhost:5432/postgres",
@@ -72,6 +92,7 @@ agent = ppo.PPOTrainer(config={
 agent.restore(checkpoint_path=checkpoint_path)
 print(rf"fcnet_hiddens={fcnet_hiddens}")
 print(rf"checkpoint_path={checkpoint_path}")
+print(best_model)
 print("=" * 100)
 env = MyEnv1()
 # run until episode ends
