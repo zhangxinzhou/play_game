@@ -39,6 +39,7 @@ best_checkpoint = analysis.best_checkpoint
 best_result = analysis.best_result
 print(type(best_checkpoint))
 print(best_checkpoint)
+
 for key, val in best_result.items():
     print(key, "=", val)
 print("*" * 100)
@@ -47,9 +48,14 @@ print(best_result.get("episode_reward_min"))
 print(best_result.get("episode_reward_mean"))
 print(best_result.get("episode_len_mean"))
 
+
 agent = ppo.PPOTrainer(config={
     "model": {
-        "fcnet_hiddens": [10, 10]
+        "fcnet_hiddens": tune.choice([
+            [10, 10],
+            [100, 100],
+            [1000, 1000]
+        ])
     }
 }, env=MyEnv1)
 agent.restore(checkpoint_path=best_checkpoint)
