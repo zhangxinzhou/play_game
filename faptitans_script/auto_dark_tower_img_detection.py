@@ -4,6 +4,9 @@ import os
 
 from datetime import datetime
 
+# 关闭安全模式
+pyautogui.FAILSAFE
+
 confidence = 0.95
 tower_go = "detection_img/tower_go.png"
 tower_relic = "detection_img/tower_relic.png"
@@ -22,6 +25,7 @@ def get_close_img_list():
 
 
 while True:
+    print(datetime.now())
     time.sleep(1)
 
     # 点击go

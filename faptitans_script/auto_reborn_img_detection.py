@@ -4,6 +4,9 @@ import os
 
 from datetime import datetime
 
+# 关闭安全模式
+pyautogui.FAILSAFE
+
 hero_lv_up = "detection_img/hero_lv_up.png"
 boss = "detection_img/boss.png"
 skill_01 = "detection_img/skill_01.png"
