@@ -1,0 +1,8 @@
+postgres:
+  db: postgres
+  host: localhost
+  port: 5432
+  user: postgres
+  pw: postgres
+  url: postgresql+psycopg2://postgres:postgres@localhost:5432/postgres
+
