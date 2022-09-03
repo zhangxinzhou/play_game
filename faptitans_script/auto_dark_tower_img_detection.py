@@ -3,6 +3,7 @@ import time
 import os
 
 from datetime import datetime
+from pynput import keyboard
 
 # 关闭安全模式
 pyautogui.FAILSAFE
@@ -25,8 +26,22 @@ def get_close_img_list():
     return close_img_list
 
 
+# 开关,控制,如果监听到esc按键被按下,整个程序就会停止
+switch = True
+
+
+def on_press(key):
+    if key == keyboard.Key.esc:
+        global switch
+        switch = False
+        return False
+
+
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
+
 count = 0
-while True:
+while switch:
     print(datetime.now())
     time.sleep(1)
 
