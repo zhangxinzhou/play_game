@@ -6,3 +6,6 @@ postgres:
   pw: postgres
   url: postgresql+psycopg2://postgres:postgres@localhost:5432/postgres
 
+
+model:
+  root_dir: F:\models
