@@ -114,6 +114,7 @@ while True:
             stop={
                 "training_iteration": training_iteration
             },
+            
             config={
                 "env": MyEnv1,
                 "num_gpus": 0,
