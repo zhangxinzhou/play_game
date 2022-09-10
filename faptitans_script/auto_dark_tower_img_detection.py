@@ -7,6 +7,8 @@ from pynput import keyboard
 
 # 关闭安全模式
 pyautogui.FAILSAFE
+# 延迟设置
+pyautogui.PAUSE = 0.0001
 
 confidence = 0.95
 tower_go = "detection_img/tower_go.png"

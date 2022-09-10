@@ -7,6 +7,8 @@ from pynput import keyboard
 
 # 关闭安全模式
 pyautogui.FAILSAFE
+# 延迟设置
+pyautogui.PAUSE = 0.0001
 
 hero_lv_up = "detection_img/hero_lv_up.png"
 boss = "detection_img/boss.png"
