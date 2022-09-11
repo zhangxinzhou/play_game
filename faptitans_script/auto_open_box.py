@@ -14,6 +14,7 @@ confidence = 0.9
 box_open = "detection_img/box_open.png"
 box_free = "detection_img/box_free.png"
 box_next = "detection_img/box_next.png"
+box_take = "detection_img/box_take.png"
 
 
 def get_close_img_list():
@@ -53,6 +54,13 @@ while switch:
 
     # 下一组箱子
     location = pyautogui.locateOnScreen(image=box_next, confidence=confidence)
+    if location is not None:
+        x, y = pyautogui.center(location)
+        pyautogui.leftClick(x, y)
+        continue
+
+    # 收集图片
+    location = pyautogui.locateOnScreen(image=box_take, confidence=confidence)
     if location is not None:
         x, y = pyautogui.center(location)
         pyautogui.leftClick(x, y)
