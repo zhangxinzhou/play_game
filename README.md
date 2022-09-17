@@ -10,6 +10,9 @@ pip install pygame
 pip install psycopg2
 pip install pyautogui
 pip install opencv-python
+pip install gputil
+
+
 
 ## 安装ray
 
