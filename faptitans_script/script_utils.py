@@ -42,4 +42,7 @@ def get_prompt_img_path_list(prefix):
 def close_prompt():
     prompt_img_path_list = get_prompt_img_path_list("prompt")
     for img_path in prompt_img_path_list:
-        click_img(img_path)
+        click_result = click_img(img_path)
+        if click_result:
+            return click_result
+    return False

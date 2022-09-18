@@ -6,7 +6,7 @@ switch = True
 
 
 def on_press(key):
-    if key == keyboard.Key.esc:
+    if key == keyboard.Key.f1:
         global switch
         switch = False
         return False
