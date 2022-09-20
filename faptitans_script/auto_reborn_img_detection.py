@@ -12,19 +12,30 @@ pyautogui.PAUSE = 0.0001
 
 hero_lv_up = "detection_img/hero_lv_up.png"
 boss = "detection_img/boss.png"
+minion = "detection_img/minion.png"
 skill_01 = "detection_img/skill_01.png"
 skill_04 = "detection_img/skill_04.png"
 skill_interval_y_axis = 70
 
 # 开关,控制,如果监听到esc按键被按下,整个程序就会停止
 switch = True
+pause = True
 
 
 def on_press(key):
+    print(key)
+    print(type(key))
     if key == keyboard.Key.esc:
         global switch
         switch = False
         return False
+    elif key == keyboard.Key.tab:
+        global pause
+        pause = not pause
+        if pause:
+            print("*" * 50, "开始", "*" * 50)
+        else:
+            print("*" * 50, "暂停", "*" * 50)
 
 
 listener = keyboard.Listener(on_press=on_press)
@@ -33,6 +44,8 @@ listener.start()
 while switch:
     print(datetime.now())
     time.sleep(1)
+    if pause:
+        continue
 
     # 是否有遮罩层
     click_able = script_utils.click_able()
@@ -72,3 +85,10 @@ while switch:
         click_result = script_utils.click_img(img_path=hero_lv_up)
         if click_result:
             continue
+
+        # 点击小怪
+        minion_location = pyautogui.locateOnScreen(image=minion, confidence=0.9)
+        if minion_location is not None:
+            x, y = pyautogui.center(minion_location)
+            pyautogui.leftClick(x - 50, y)
+            pyautogui.moveTo(x=100, y=100)
