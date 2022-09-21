@@ -19,7 +19,7 @@ skill_interval_y_axis = 70
 
 # 开关,控制,如果监听到esc按键被按下,整个程序就会停止
 switch = True
-pause = True
+pause = False
 
 
 def on_press(key):
