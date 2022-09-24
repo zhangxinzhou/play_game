@@ -22,7 +22,7 @@ from src.utils import list_mutation
 # 模型,是训练还是测试
 TRAIN_MODEL = True
 # 框架
-FRAMEWORK = "tf2"
+FRAMEWORK = "torch"
 # 模型文件存放路径
 MODEL_PATH = r"F:\models"
 # 游戏名称
@@ -113,6 +113,7 @@ listener.start()
 if TRAIN_MODEL:
     # 训练开始
     print("*" * 50, "训练开始...", "*" * 50)
+    ray.init()
     while switch:
         model_count = session.query(func.count(ModelIteration.model_id)).scalar()
         # 如果era一条数据都没有，则初始化一个模型
@@ -232,6 +233,7 @@ if TRAIN_MODEL:
                     break
     # 训练结束
     print("*" * 50, "训练结束...", "*" * 50)
+    ray.shutdown()
 else:
     # 测试开始
     print("*" * 50, "测试开始...", "*" * 50)
