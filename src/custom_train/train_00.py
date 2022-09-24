@@ -20,7 +20,9 @@ from src.utils import list_mutation
 ###############################################
 # 常量相关定义
 # 模型,是训练还是测试
-TRAIN_MODEL = False
+TRAIN_MODEL = True
+# 框架
+FRAMEWORK = "tf2"
 # 模型文件存放路径
 MODEL_PATH = r"F:\models"
 # 游戏名称
@@ -48,6 +50,7 @@ class ModelIteration(Base):
     checkpoint_path = Column(VARCHAR, comment="存储路径")
     iteration_num = Column(BIGINT, comment="世代(第几代)")
     env_name = Column(VARCHAR, comment="环境名称")
+    framework = Column(VARCHAR, comment="框架类型")
     fcnet_hiddens = Column(TEXT, comment="模型全连接层")
     train_status = Column(VARCHAR, comment="todo(待处理),doing(处理中),done(处理完成)", server_default="todo")
     train_start_date = Column(TIMESTAMP, comment="训练开始时间")
@@ -131,10 +134,11 @@ if TRAIN_MODEL:
                 ppo.PPO,
                 param_space={
                     "env": ENV_NAME,
+                    # "framework": FRAMEWORK,
                     "model": {
                         "fcnet_hiddens": fcnet_hiddens
                     },
-                    "num_gpus": 1,
+                    "num_gpus": 0,
                     "num_workers": 10,
                     # "lr": tune.grid_search([0.01, 0.001, 0.0001]),
                 },
@@ -174,6 +178,7 @@ if TRAIN_MODEL:
             # 更新数据库
             end_time = datetime.now()
             era_cost = end_time - start_time
+            model_todo.framework = best_result_config.get("framework")
             model_todo.checkpoint_path = best_checkpoint
             model_todo.train_start_date = start_time
             model_todo.train_end_date = end_time
@@ -234,6 +239,7 @@ else:
         ModelIteration.reward.desc(),
         ModelIteration.cost.asc()).first()
     best_agent = ppo.PPO(config={
+        "framework": best_model.framework,
         "model": {
             "fcnet_hiddens": json.loads(best_model.fcnet_hiddens)
         }

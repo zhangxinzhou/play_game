@@ -3,7 +3,8 @@ import gym
 from ray import air, tune
 import ray.rllib.algorithms.ppo as ppo
 
-TRAINING_ITERATION = 2
+TRAINING_ITERATION = 20
+FRAMEWORK = "torch"
 FCNET_HIDDENS_LIST = [
     [10, 10],
     [20, 20],
@@ -17,10 +18,11 @@ for fcnet_hiddens in FCNET_HIDDENS_LIST:
         "PPO",
         param_space={
             "env": "CartPole-v0",
+            # "framework": FRAMEWORK,
             "model": {
                 "fcnet_hiddens": fcnet_hiddens
             },
-            "num_gpus": 1,
+            "num_gpus": 0,
             "num_workers": 10,
         },
         tune_config=ray.tune.tune_config.TuneConfig(
@@ -59,6 +61,7 @@ for fcnet_hiddens in FCNET_HIDDENS_LIST:
     # 开始测试
     print("*" * 50, "测试开始...", "*" * 50)
     best_agent = ppo.PPO(config={
+        "framework": best_result_config.get("framework"),
         "model": {
             "fcnet_hiddens": fcnet_hiddens
         }
