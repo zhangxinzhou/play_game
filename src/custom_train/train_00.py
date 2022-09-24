@@ -139,7 +139,7 @@ if TRAIN_MODEL:
                     "model": {
                         "fcnet_hiddens": fcnet_hiddens
                     },
-                    "num_gpus": 0,
+                    "num_gpus": 1,
                     "num_workers": 10,
                     # "lr": tune.grid_search([0.01, 0.001, 0.0001]),
                 },
