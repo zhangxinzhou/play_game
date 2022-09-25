@@ -34,7 +34,7 @@ ENV_CAPACITY = 100
 # 模型全连接层
 INIT_FCNET_HIDDENS = [10, 10]
 # 训练迭代次数
-TRAINING_ITERATION = 20
+TRAINING_ITERATION = 50
 ###############################################
 
 Base = declarative_base()
@@ -113,7 +113,6 @@ listener.start()
 if TRAIN_MODEL:
     # 训练开始
     print("*" * 50, "训练开始...", "*" * 50)
-    ray.init()
     while switch:
         model_count = session.query(func.count(ModelIteration.model_id)).scalar()
         # 如果era一条数据都没有，则初始化一个模型
@@ -131,11 +130,12 @@ if TRAIN_MODEL:
             model_name = model_todo.model_id
             fcnet_hiddens = json.loads(model_todo.fcnet_hiddens)
             train_seq = session.query(func.max(ModelIteration.train_seq)).scalar() + 1
+            ray.init()
             tuner = tune.Tuner(
                 ppo.PPO,
                 param_space={
                     "env": ENV_NAME,
-                    # "framework": FRAMEWORK,
+                    "framework": FRAMEWORK,
                     "model": {
                         "fcnet_hiddens": fcnet_hiddens
                     },
@@ -163,6 +163,7 @@ if TRAIN_MODEL:
                 ),
             )
             results = tuner.fit()
+            ray.shutdown()
 
             # 取出训练信息
             best_result = results.get_best_result(metric="episode_reward_mean", mode="max")
@@ -199,6 +200,7 @@ if TRAIN_MODEL:
             for num in fcnet_hiddens:
                 cost = cost * num
             model_todo.cost = cost
+            model_todo.updated_date = datetime.now()
         else:
             # 所有待训练的模型已经训练完毕,因此繁衍下一代模型
             iteration_max = session.query(func.max(ModelIteration.iteration_num)).filter_by(
@@ -233,7 +235,6 @@ if TRAIN_MODEL:
                     break
     # 训练结束
     print("*" * 50, "训练结束...", "*" * 50)
-    ray.shutdown()
 else:
     # 测试开始
     print("*" * 50, "测试开始...", "*" * 50)
