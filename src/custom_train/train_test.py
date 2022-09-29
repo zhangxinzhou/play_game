@@ -24,8 +24,6 @@ for fcnet_hiddens in FCNET_HIDDENS_LIST:
             "model": {
                 "fcnet_hiddens": fcnet_hiddens
             },
-            "num_gpus": 1,
-            "num_workers": 10,
         },
         tune_config=ray.tune.tune_config.TuneConfig(
             metric="episode_reward_mean",
