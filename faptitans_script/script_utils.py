@@ -23,7 +23,7 @@ def click_able():
     location = pyautogui.locateOnScreen(image=MASK_LAYER_PATH, confidence=0.95)
     if location is not None:
         x, y = pyautogui.center(location)
-        return pyautogui.pixelMatchesColor(int(x), int(y), (255, 255, 255))
+        return pyautogui.pixelMatchesColor(int(x), int(y), (255, 87, 87))
     return False
 
 
@@ -46,3 +46,12 @@ def close_prompt():
         if click_result:
             return click_result
     return False
+
+
+if __name__ == '__main__':
+    location = pyautogui.locateOnScreen(image=MASK_LAYER_PATH, confidence=0.95)
+    if location is not None:
+        x, y = pyautogui.center(location)
+        tmp = pyautogui.pixel(int(x), int(y))
+        print(tmp)
+        # return pyautogui.pixelMatchesColor(int(x), int(y), (255, 255, 255))
