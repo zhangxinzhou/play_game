@@ -16,15 +16,20 @@ import json
 from pynput import keyboard
 
 from src.utils import list_mutation
+from src.utils import config_util
 
 ###############################################
 # 常量相关定义
+# 从
+config = config_util.get_config()
 # 模型,是训练还是测试
 TRAIN_MODEL = True
 # 框架
 FRAMEWORK = "torch"
 # 模型文件存放路径
-MODEL_PATH = r"F:\models"
+MODEL_PATH = config['model']['root_dir']
+# 数据库的连接串
+DB_URL = config['postgres']['url']
 # 游戏名称
 ENV_NAME = "CartPole-v0"
 # checkpoint文件存放文件夹
@@ -78,21 +83,11 @@ def get_uuid():
     return uuid.uuid4().hex
 
 
-engine = create_engine(
-    url="postgresql+psycopg2://postgres:postgres@localhost:5432/postgres",
-    encoding="utf-8",
-    echo=True
-)
+engine = create_engine(url=DB_URL, encoding="utf-8", echo=True)
 Base.metadata.create_all(engine)
 # 建表
 db_session = sessionmaker(bind=engine, autocommit=True)
 session = db_session()
-
-# 删除全部数据-方便从头开始
-is_delete_all = False
-if is_delete_all:
-    session.query(ModelIteration).delete()
-    session.commit()
 
 # 开关,控制,如果监听到esc按键被按下,整个程序就会停止
 switch = True
