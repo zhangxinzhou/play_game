@@ -20,16 +20,18 @@ from src.utils import config_util
 
 ###############################################
 # 常量相关定义
-# 从
+# 从config文件加载配置
 config = config_util.get_config()
 # 模型,是训练还是测试
-TRAIN_MODEL = False
+TRAIN_MODEL = True
 # 框架
 FRAMEWORK = "torch"
 # 模型文件存放路径
 MODEL_PATH = config['model']['root_dir']
 # 数据库的连接串
 DB_URL = config['postgres']['url']
+# 迭代模型的表名
+TABLE_NAME = "model_iteration_0001"
 # 游戏名称
 ENV_NAME = "CartPole-v0"
 # checkpoint文件存放文件夹
@@ -47,7 +49,7 @@ Base = declarative_base()
 
 class ModelIteration(Base):
     # 表信息
-    __tablename__ = "model_iteration_0001"
+    __tablename__ = TABLE_NAME
     __table_args__ = ({"comment": "模型迭代表"})
     # 表字段信息
     model_id = Column(VARCHAR, primary_key=True, comment="模型id")
@@ -170,7 +172,7 @@ if TRAIN_MODEL:
                     # 停止条件
                     stop={"training_iteration": TRAINING_ITERATION},
                     # verbose
-                    verbose=2,
+                    verbose=3,
                     # checkpoint_config
                     checkpoint_config=air.CheckpointConfig(
                         checkpoint_at_end=True

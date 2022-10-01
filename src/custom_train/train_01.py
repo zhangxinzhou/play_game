@@ -1,8 +1,8 @@
 import os.path
 
 import ray
-from ray import tune
-from ray.rllib.agents import ppo
+from ray import air, tune
+import ray.rllib.algorithms.ppo as ppo
 
 from sqlalchemy import Column, BIGINT, NUMERIC, VARCHAR, TEXT, TIMESTAMP, Interval, create_engine
 from sqlalchemy.sql.expression import text
@@ -10,18 +10,48 @@ from sqlalchemy import func
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from datetime import datetime
+import uuid
 import json
+from pynput import keyboard
 
-from src.custom_env.MyEnv1 import MyEnv1
-from src.custom_env.MyEnv1 import  MyEnv1
+from src.utils import list_mutation
+from src.utils import config_util
+from src.custom_env.MyEnv2 import MyEnv2
 
+###############################################
+# 常量相关定义
+# 从config文件加载配置
+config = config_util.get_config()
+# 模型,是训练还是测试
+TRAIN_MODEL = True
+# 框架
+FRAMEWORK = "tf"
+# 模型文件存放路径
+MODEL_PATH = config['model']['root_dir']
+# 数据库的连接串
+DB_URL = config['postgres']['url']
+# 迭代模型的表名
+TABLE_NAME = "model_iteration_0002"
+# 环境
+ENV_CLASS = MyEnv2
+# 游戏名称
+ENV_NAME = ENV_CLASS.__name__
+# checkpoint文件存放文件夹
+LOCAL_DIR = os.path.join(MODEL_PATH, ENV_NAME)
+# 环境-最大承载量
+ENV_CAPACITY = 100
+# 模型全连接层
+INIT_FCNET_HIDDENS = [10, 10]
+# 训练迭代次数
+TRAINING_ITERATION = 30
+###############################################
 
 Base = declarative_base()
 
 
 class ModelIteration(Base):
     # 表信息
-    __tablename__ = "model_iteration_test02"
+    __tablename__ = TABLE_NAME
     __table_args__ = ({"comment": "模型迭代表"})
     # 表字段信息
     model_id = Column(VARCHAR, primary_key=True, comment="模型id")
@@ -29,6 +59,7 @@ class ModelIteration(Base):
     checkpoint_path = Column(VARCHAR, comment="存储路径")
     iteration_num = Column(BIGINT, comment="世代(第几代)")
     env_name = Column(VARCHAR, comment="环境名称")
+    framework = Column(VARCHAR, comment="框架类型")
     fcnet_hiddens = Column(TEXT, comment="模型全连接层")
     train_status = Column(VARCHAR, comment="todo(待处理),doing(处理中),done(处理完成)", server_default="todo")
     train_start_date = Column(TIMESTAMP, comment="训练开始时间")
@@ -41,6 +72,7 @@ class ModelIteration(Base):
     episode_reward_min = Column(NUMERIC, comment="episode_reward_min")
     episode_reward_mean = Column(NUMERIC, comment="episode_reward_mean")
     episode_len_mean = Column(NUMERIC, comment="episode_len_mean")
+    error = Column(TEXT, comment="error")
     passed = Column(VARCHAR, comment="是否合格（Y或N）")
     reward = Column(NUMERIC, comment="评分，报酬")
     cost = Column(NUMERIC, comment="花费，成本")
@@ -71,41 +103,182 @@ class ModelIteration(Base):
         return "\n".join([line0, line1, line2, line0])
 
 
-engine = create_engine(
-    url="postgresql+psycopg2://postgres:postgres@localhost:5432/postgres",
-    encoding="utf-8",
-    echo=True
-)
+def get_uuid():
+    return uuid.uuid4().hex
+
+
+engine = create_engine(url=DB_URL, encoding="utf-8", echo=True)
+Base.metadata.create_all(engine)
 # 建表
 db_session = sessionmaker(bind=engine, autocommit=True)
 session = db_session()
 
-best_model: ModelIteration = session.query(ModelIteration).filter_by(train_status="done").order_by(
-    ModelIteration.episode_reward_mean.desc()).first()
-fcnet_hiddens = json.loads(best_model.fcnet_hiddens)
-checkpoint_path = best_model.checkpoint_path
-# 最好的模型
-agent = ppo.PPOTrainer(config={
-    "model": {
-        "fcnet_hiddens": fcnet_hiddens
-    }
-}, env=MyEnv1)
-agent.restore(checkpoint_path=checkpoint_path)
-print(rf"fcnet_hiddens={fcnet_hiddens}")
-print(rf"checkpoint_path={checkpoint_path}")
-print(best_model)
-print("=" * 100)
-env = MyEnv1()
-# run until episode ends
-for i in range(10):
-    episode_reward = 0
-    done = False
-    obs = env.reset()
-    while not done:
-        # 设置full_fetch=True可以获得除了action外的其他辅助信息，
-        # 包括action的logits，及obs的value等
-        action = agent.compute_action(obs)
-        obs, reward, done, info = env.step(action)
-        episode_reward += reward
+# 开关,控制,如果监听到esc按键被按下,整个程序就会停止
+switch = True
 
-    print(f"NO.{i},episode_reward={episode_reward}")
+
+def on_press(key):
+    if key == keyboard.Key.f12:
+        global switch
+        switch = False
+        print("*" * 50, f"监听到{key}按键被按下...", "*" * 50)
+        print("*" * 50, "程序将在本次训练完毕后结束...", "*" * 50)
+        return False
+
+
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
+
+if TRAIN_MODEL:
+    # 训练开始
+    print("*" * 50, "训练开始...", "*" * 50)
+    while switch:
+        model_count = session.query(func.count(ModelIteration.model_id)).scalar()
+        # 如果era一条数据都没有，则初始化一个模型
+        if model_count == 0:
+            model_init_obj = ModelIteration(model_id=get_uuid(), train_seq=0, iteration_num=0,
+                                            fcnet_hiddens=json.dumps(INIT_FCNET_HIDDENS),
+                                            env_name=ENV_NAME, train_status="todo")
+            session.add(model_init_obj)
+
+        # 取出待训练的模型
+        model_todo: ModelIteration = session.query(ModelIteration).filter_by(train_status="todo").first()
+        if model_todo is not None:
+            start_time = datetime.now()
+            # 模型名称
+            model_name = model_todo.model_id
+            fcnet_hiddens = json.loads(model_todo.fcnet_hiddens)
+            train_seq = session.query(func.max(ModelIteration.train_seq)).scalar() + 1
+            ray.init()
+            tuner = tune.Tuner(
+                ppo.PPO,
+                param_space={
+                    "env": ENV_CLASS,
+                    "framework": FRAMEWORK,
+                    "model": {
+                        "fcnet_hiddens": fcnet_hiddens
+                    },
+                    "num_gpus": 1,
+                    "num_workers": 10,
+                    # "lr": tune.grid_search([0.01, 0.001, 0.0001]),
+                },
+                tune_config=ray.tune.tune_config.TuneConfig(
+                    metric="episode_reward_mean",
+                    mode="max"
+                ),
+                run_config=air.RunConfig(
+                    # 保存路径
+                    local_dir=LOCAL_DIR,
+                    # 名字
+                    name=model_name,
+                    # 停止条件
+                    stop={"training_iteration": TRAINING_ITERATION},
+                    # verbose
+                    verbose=3,
+                    # checkpoint_config
+                    checkpoint_config=air.CheckpointConfig(
+                        checkpoint_at_end=True
+                    )
+                ),
+            )
+            results = tuner.fit()
+            ray.shutdown()
+
+            # 取出训练信息
+            best_result = results.get_best_result(metric="episode_reward_mean", mode="max")
+            best_result_config = best_result.config
+            best_result_metrics = best_result.metrics
+            best_checkpoint = best_result.checkpoint._local_path
+            episode_reward_max = best_result_metrics.get('episode_reward_max')
+            episode_reward_min = best_result_metrics.get('episode_reward_min')
+            episode_reward_mean = best_result_metrics.get('episode_reward_mean')
+            episode_len_mean = best_result_metrics.get('episode_len_mean')
+            episode_reward_rate = episode_reward_mean / episode_len_mean
+            error = best_result.error.__str__()
+
+            # 更新数据库
+            end_time = datetime.now()
+            era_cost = end_time - start_time
+            model_todo.framework = best_result_config.get("framework")
+            model_todo.checkpoint_path = best_checkpoint
+            model_todo.train_start_date = start_time
+            model_todo.train_end_date = end_time
+            model_todo.train_cost_time = era_cost
+            model_todo.train_status = "done"
+            model_todo.train_info = '{}'
+            model_todo.train_seq = train_seq
+            model_todo.training_iteration = TRAINING_ITERATION
+            model_todo.episode_reward_max = episode_reward_max
+            model_todo.episode_reward_min = episode_reward_min
+            model_todo.episode_reward_mean = episode_reward_mean
+            model_todo.episode_len_mean = episode_len_mean
+            model_todo.error = error
+            model_todo.passed = 'Y' if episode_reward_rate > 0.9 else 'N'
+            model_todo.reward = episode_reward_mean
+            cost = 1
+            for num in fcnet_hiddens:
+                cost = cost * num
+            model_todo.cost = cost
+            model_todo.updated_date = datetime.now()
+        else:
+            # 所有待训练的模型已经训练完毕,因此繁衍下一代模型
+            iteration_max = session.query(func.max(ModelIteration.iteration_num)).filter_by(
+                train_status="done").scalar()
+            iteration_next_num = iteration_max + 1
+            # 取出最近一代已训练完成的全部模型的
+            iteration_list = session.query(ModelIteration).filter_by(iteration_num=iteration_max).order_by(
+                ModelIteration.reward.desc(), ModelIteration.cost.asc()).all()
+            for index, model_tmp in enumerate(iteration_list):
+                # 更新最近一代模型的排名(评分高,成本低)
+                model_tmp.rank = index + 1
+            # 优先获取合格的(passed=Y)模型,如果没有合格的,则获取全部的模型,排个序,优秀的模型繁衍下一代
+            iteration_list = session.query(ModelIteration).filter_by(iteration_num=iteration_max, passed='Y').order_by(
+                ModelIteration.rank.desc()).all()
+            if len(iteration_list) == 0:
+                iteration_list = session.query(ModelIteration).filter_by(iteration_num=iteration_max).order_by(
+                    ModelIteration.rank.desc()).all()
+
+            for index, model_tmp in enumerate(iteration_list):
+                fcnet_hiddens_old = json.loads(model_tmp.fcnet_hiddens)
+                fcnet_hiddens_new_list = list_mutation.list_mutation(fcnet_hiddens_old)
+                for fcnet_hiddens_new in fcnet_hiddens_new_list:
+                    model_next_obj = ModelIteration(model_id=get_uuid(), model_parent_id=model_tmp.model_id,
+                                                    iteration_num=iteration_next_num,
+                                                    fcnet_hiddens=json.dumps(fcnet_hiddens_new), env_name=ENV_NAME,
+                                                    train_status="todo")
+                    session.add(model_next_obj)
+                # 环境承载能力,下一代最多有一百个
+                model_next_count = session.query(func.count(ModelIteration.model_id)).filter_by(
+                    iteration_num=iteration_next_num).scalar()
+                if model_next_count >= ENV_CAPACITY:
+                    break
+    # 训练结束
+    print("*" * 50, "训练结束...", "*" * 50)
+else:
+    # 测试开始
+    print("*" * 50, "测试开始...", "*" * 50)
+    best_model: ModelIteration = session.query(ModelIteration).filter_by(train_status='done').order_by(
+        ModelIteration.reward.desc(),
+        ModelIteration.cost.asc()).first()
+    best_agent = ppo.PPO(config={
+        "framework": best_model.framework,
+        "model": {
+            "fcnet_hiddens": json.loads(best_model.fcnet_hiddens)
+        }
+    }, env=ENV_CLASS)
+    best_agent.restore(checkpoint_path=best_model.checkpoint_path)
+    env = ENV_CLASS()
+    print(best_model)
+    for i in range(10):
+        episode_reward = 0
+        done = False
+        obs = env.reset()
+        while not done:
+            action = best_agent.compute_single_action(obs)
+            obs, reward, done, info = env.step(action)
+            episode_reward += reward
+
+        print(f"NO.{i},episode_reward={episode_reward}")
+
+    # 测试结束
+    print("*" * 50, "测试结束...", "*" * 50)
