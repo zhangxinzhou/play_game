@@ -23,11 +23,11 @@ from src.utils import config_util
 # 从
 config = config_util.get_config()
 # 模型,是训练还是测试
-TRAIN_MODEL = True
+TRAIN_MODEL = False
 # 框架
 FRAMEWORK = "torch"
 # 模型文件存放路径
-MODEL_PATH = config['model']['root_dir' ]
+MODEL_PATH = config['model']['root_dir']
 # 数据库的连接串
 DB_URL = config['postgres']['url']
 # 游戏名称
@@ -77,6 +77,26 @@ class ModelIteration(Base):
     created_date = Column(TIMESTAMP, comment="创建时间", server_default=text("NOW()"))
     updated_by = Column(VARCHAR, comment="更新人", server_default="system")
     updated_date = Column(TIMESTAMP, comment="更新时间", server_default=text("NOW()"))
+
+    def __str__(self):
+        line0 = ""
+        line1 = ""
+        line2 = ""
+        for key, val in self.__dict__.items():
+            if not str(key).startswith("_"):
+                tmp1 = str(key)
+                tmp2 = str(val)
+                len1 = len(tmp1)
+                len2 = len(tmp2)
+                diff = abs(len1 - len2)
+                line0 += "-" * (max(len1, len2) + 1)
+                if len1 > len2:
+                    line1 += tmp1 + "|"
+                    line2 += tmp2 + " " * diff + "|"
+                else:
+                    line1 += tmp1 + " " * diff + "|"
+                    line2 += tmp2 + "|"
+        return "\n".join([line0, line1, line2, line0])
 
 
 def get_uuid():
@@ -244,6 +264,7 @@ else:
     }, env=best_model.env_name)
     best_agent.restore(checkpoint_path=best_model.checkpoint_path)
     env = gym.make(best_model.env_name)
+    print(best_model)
     for i in range(10):
         episode_reward = 0
         done = False
