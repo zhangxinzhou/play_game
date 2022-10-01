@@ -270,7 +270,7 @@ else:
         done = False
         obs = env.reset()
         while not done:
-            action = best_agent.compute_action(obs)
+            action = best_agent.compute_single_action(obs)
             obs, reward, done, info = env.step(action)
             episode_reward += reward
 
