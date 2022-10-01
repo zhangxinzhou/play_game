@@ -27,7 +27,7 @@ TRAIN_MODEL = True
 # 框架
 FRAMEWORK = "torch"
 # 模型文件存放路径
-MODEL_PATH = config['model']['root_dir']
+MODEL_PATH = config['model']['root_dir' ]
 # 数据库的连接串
 DB_URL = config['postgres']['url']
 # 游戏名称
