@@ -40,10 +40,15 @@ ENV_NAME = ENV_CLASS.__name__
 LOCAL_DIR = os.path.join(MODEL_PATH, ENV_NAME)
 # 环境-最大承载量
 ENV_CAPACITY = 100
-# 模型全连接层
-INIT_FCNET_HIDDENS = [10, 10]
+# 初始模型全连接层
+INIT_FCNET_HIDDENS_LIST = [
+    [10, 10],
+    [100, 100],
+    [1000, 1000],
+    [100, 100, 100]
+]
 # 训练迭代次数
-TRAINING_ITERATION = 30
+TRAINING_ITERATION = 20
 ###############################################
 
 Base = declarative_base()
@@ -136,10 +141,11 @@ if TRAIN_MODEL:
         model_count = session.query(func.count(ModelIteration.model_id)).scalar()
         # 如果era一条数据都没有，则初始化一个模型
         if model_count == 0:
-            model_init_obj = ModelIteration(model_id=get_uuid(), train_seq=0, iteration_num=0,
-                                            fcnet_hiddens=json.dumps(INIT_FCNET_HIDDENS),
-                                            env_name=ENV_NAME, train_status="todo")
-            session.add(model_init_obj)
+            for INIT_FCNET_HIDDENS in INIT_FCNET_HIDDENS_LIST:
+                model_init_obj = ModelIteration(model_id=get_uuid(), train_seq=0, iteration_num=0,
+                                                fcnet_hiddens=json.dumps(INIT_FCNET_HIDDENS),
+                                                env_name=ENV_NAME, train_status="todo")
+                session.add(model_init_obj)
 
         # 取出待训练的模型
         model_todo: ModelIteration = session.query(ModelIteration).filter_by(train_status="todo").first()
@@ -258,8 +264,7 @@ else:
     # 测试开始
     print("*" * 50, "测试开始...", "*" * 50)
     best_model: ModelIteration = session.query(ModelIteration).filter_by(train_status='done').order_by(
-        ModelIteration.reward.desc(),
-        ModelIteration.cost.asc()).first()
+        ModelIteration.reward.desc()).first()
     best_agent = ppo.PPO(config={
         "framework": best_model.framework,
         "model": {
