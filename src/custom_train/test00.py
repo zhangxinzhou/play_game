@@ -55,6 +55,7 @@ for fcnet_hiddens in FCNET_HIDDENS_LIST:
     episode_reward_mean = best_result_metrics.get('episode_reward_mean')
     episode_len_mean = best_result_metrics.get('episode_len_mean')
     error = best_result.error.__str__()
+    cost = int(best_result_metrics.get('time_this_iter_s'))
     print(
         f"best_checkpoint={best_checkpoint},episode_reward_max={episode_reward_max},episode_reward_min={episode_reward_min},episode_reward_mean={episode_reward_mean},episode_len_mean={episode_len_mean}")
 

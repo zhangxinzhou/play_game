@@ -16,7 +16,8 @@ from pynput import keyboard
 
 from src.utils import list_mutation
 from src.utils import config_util
-from src.custom_env.MyEnv2 import MyEnv2
+#from src.custom_env.MyEnv2 import MyEnv2
+from src.custom_env.MyEnv1 import MyEnv1
 
 ###############################################
 # 常量相关定义
@@ -33,7 +34,7 @@ DB_URL = config['postgres']['url']
 # 迭代模型的表名
 TABLE_NAME = "model_iteration_0002"
 # 环境
-ENV_CLASS = MyEnv2
+ENV_CLASS = MyEnv1
 # 游戏名称
 ENV_NAME = ENV_CLASS.__name__
 # checkpoint文件存放文件夹
@@ -45,7 +46,8 @@ INIT_FCNET_HIDDENS_LIST = [
     [10, 10],
     [100, 100],
     [1000, 1000],
-    [100, 100, 100]
+    [100, 100, 100],
+    [100, 100, 100, 100]
 ]
 # 训练迭代次数
 TRAINING_ITERATION = 20
@@ -141,9 +143,9 @@ if TRAIN_MODEL:
         model_count = session.query(func.count(ModelIteration.model_id)).scalar()
         # 如果era一条数据都没有，则初始化一个模型
         if model_count == 0:
-            for INIT_FCNET_HIDDENS in INIT_FCNET_HIDDENS_LIST:
+            for init_fcnet_hiddens in INIT_FCNET_HIDDENS_LIST:
                 model_init_obj = ModelIteration(model_id=get_uuid(), train_seq=0, iteration_num=0,
-                                                fcnet_hiddens=json.dumps(INIT_FCNET_HIDDENS),
+                                                fcnet_hiddens=json.dumps(init_fcnet_hiddens),
                                                 env_name=ENV_NAME, train_status="todo")
                 session.add(model_init_obj)
 
@@ -221,9 +223,7 @@ if TRAIN_MODEL:
             model_todo.error = error
             model_todo.passed = 'Y' if episode_reward_rate > 0.9 else 'N'
             model_todo.reward = episode_reward_mean
-            cost = 1
-            for num in fcnet_hiddens:
-                cost = cost * num
+            cost = int(best_result_metrics.get('time_this_iter_s'))
             model_todo.cost = cost
             model_todo.updated_date = datetime.now()
         else:
