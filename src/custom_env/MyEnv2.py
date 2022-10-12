@@ -3,23 +3,25 @@ import numpy as np
 import gym
 from gym.spaces import Discrete, Box
 
+# 图片帧的尺寸
+frame_shape = (10, 10, 3)
+
 
 def get_frame():
-    frame = np.random.randint(low=0, high=256, size=(10, 10))
-    frame = frame / 255
+    frame = np.random.randint(low=0, high=255, size=frame_shape)
     return frame
 
 
 def get_expect_action(frame):
     mean = np.mean(frame)
-    action = 0 if mean < 0.5 else 1
+    action = 0 if mean < 128 else 1
     return action
 
 
 class MyEnv2(gym.Env):
     def __init__(self, config: dict = None):
         self.action_space = Discrete(n=2)
-        self.observation_space = Box(low=0.0, high=1.0, shape=(10, 10), dtype=np.float32)
+        self.observation_space = Box(low=0.0, high=1.0, shape=frame_shape, dtype=np.float32)
         self.count = 0
         self.expect_action = 0
 
