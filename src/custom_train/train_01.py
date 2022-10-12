@@ -16,8 +16,8 @@ from pynput import keyboard
 
 from src.utils import list_mutation
 from src.utils import config_util
-#from src.custom_env.MyEnv2 import MyEnv2
-from src.custom_env.MyEnv1 import MyEnv1
+from src.custom_env.MyEnv2 import MyEnv2
+# from src.custom_env.MyEnv1 import MyEnv1
 
 ###############################################
 # 常量相关定义
@@ -34,7 +34,7 @@ DB_URL = config['postgres']['url']
 # 迭代模型的表名
 TABLE_NAME = "model_iteration_0002"
 # 环境
-ENV_CLASS = MyEnv1
+ENV_CLASS = MyEnv2
 # 游戏名称
 ENV_NAME = ENV_CLASS.__name__
 # checkpoint文件存放文件夹

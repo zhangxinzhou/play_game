@@ -4,11 +4,13 @@ import gym
 from gym.spaces import Discrete, Box
 
 # 图片帧的尺寸
+low = 0
+high = 255
 frame_shape = (10, 10, 3)
 
 
 def get_frame():
-    frame = np.random.randint(low=0, high=255, size=frame_shape)
+    frame = np.random.randint(low=low, high=high, size=frame_shape)
     return frame
 
 
@@ -21,7 +23,7 @@ def get_expect_action(frame):
 class MyEnv2(gym.Env):
     def __init__(self, config: dict = None):
         self.action_space = Discrete(n=2)
-        self.observation_space = Box(low=0.0, high=1.0, shape=frame_shape, dtype=np.float32)
+        self.observation_space = Box(low=low, high=high, shape=frame_shape, dtype=np.int32)
         self.count = 0
         self.expect_action = 0
 
