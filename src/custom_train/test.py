@@ -1,14 +1,12 @@
-# from src.custom_env.MyEnv2 import MyEnv2
-#
-#
-# a = MyEnv2()
+import sys
 
+# sys.path.append(r'D:\repository\git\game_explorer')
 
-list = [
-    [1, 2],
-    [2, 3],
-    [5, 6]
-]
-
-for i in list:
+# print(sys.path)
+for i in sys.path:
     print(i)
+print(type(sys.path))
+
+from src.custom_env.MyEnv2 import MyEnv2
+
+a = MyEnv2()
