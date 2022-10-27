@@ -6,7 +6,7 @@ from gym.spaces import Discrete, Box
 # 图片帧的尺寸
 low = 0
 high = 255
-frame_shape = (10, 10, 3)
+frame_shape = (42, 42, 3)
 
 
 def get_frame():

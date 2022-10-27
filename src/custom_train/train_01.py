@@ -17,6 +17,7 @@ from pynput import keyboard
 from src.utils import list_mutation
 from src.utils import config_util
 from src.custom_env.MyEnv2 import MyEnv2
+
 # from src.custom_env.MyEnv1 import MyEnv1
 
 ###############################################
@@ -164,7 +165,18 @@ if TRAIN_MODEL:
                     "env": ENV_CLASS,
                     "framework": FRAMEWORK,
                     "model": {
-                        "fcnet_hiddens": fcnet_hiddens
+                        # 1.卷积层
+                        # [out_channels 输出_通道, kernel 内核, stride 步幅]
+                        "conv_filters": [
+                            # [16, [4, 4], 2],
+                            # [32, [4, 4], 2],
+                            # [512, [11, 11], 1]
+                            [32, [15, 15], 1]
+                        ],
+                        # 2.全连接层
+                        "fcnet_hiddens": fcnet_hiddens,
+                        # 3.后置全连接层
+                        "post_fcnet_hiddens": []
                     },
                     "num_gpus": 1,
                     "num_workers": 10,

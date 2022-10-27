@@ -7,17 +7,18 @@ TRAINING_ITERATION = 3
 FRAMEWORK = "torch"
 FCNET_HIDDENS_LIST = [
     [10, 10],
-    [20, 20],
-    [30, 30],
-    [64, 64]
+    # [20, 20],
+    # [30, 30],
+    # [64, 64]
 ]
 
 for fcnet_hiddens in FCNET_HIDDENS_LIST:
+    ray.shutdown()
     ray.init()
     print("*" * 100)
     print(fcnet_hiddens)
     tuner = tune.Tuner(
-        "PPO",
+        ppo.PPO,
         param_space={
             "env": "CartPole-v0",
             "framework": FRAMEWORK,
