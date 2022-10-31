@@ -10,3 +10,8 @@ print(type(sys.path))
 from src.custom_env.MyEnv2 import MyEnv2
 
 a = MyEnv2()
+
+import ray.rllib.algorithms.ppo as ppo
+
+ppo_config = ppo.DEFAULT_CONFIG.copy()
+print(ppo_config)

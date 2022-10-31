@@ -5,7 +5,8 @@ from gym.spaces import Discrete, Box
 
 # 图片帧的尺寸
 low = 0
-high = 255
+high = 256
+half_value = (low + high) / 2
 frame_shape = (42, 42, 3)
 
 
@@ -15,8 +16,10 @@ def get_frame():
 
 
 def get_expect_action(frame):
-    mean = np.mean(frame)
-    action = 0 if mean < 128 else 1
+    count = np.sum(frame > half_value)
+    size = np.size(frame)
+    half_size = size / 2
+    action = 0 if count < half_size else 1
     return action
 
 
