@@ -25,6 +25,8 @@ def on_press(key):
     if key == keyboard.Key.esc:
         global switch
         switch = False
+        print("*" * 50, f"监听到{key}按键被按下...", "*" * 50)
+        print("*" * 50, "程序将在本次训练完毕后结束...", "*" * 50)
         return False
 
 
