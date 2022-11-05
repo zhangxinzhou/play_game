@@ -10,7 +10,7 @@ pyautogui.FAILSAFE = False
 # 延迟设置
 pyautogui.PAUSE = 0.0001
 
-confidence = 0.95
+confidence = 0.95   
 tower_in = "detection_img/tower_in.png"
 tower_go = "detection_img/tower_go.png"
 tower_relic = "detection_img/tower_relic.png"
