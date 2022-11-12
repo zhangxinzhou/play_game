@@ -9,7 +9,7 @@ from src.custom_env.MyEnv2 import MyEnv2
 # ====================常量=====================
 
 # 迭代轮数
-TRAINING_ITERATION = 3
+TRAINING_ITERATION = 10
 # 迭代轮数
 EPISODE_ITERATION = 3
 # 框架
@@ -76,25 +76,67 @@ def train():
         trainer.stop()
 
     sort_list = sorted(tmp_list, key=lambda item: item['episode_reward_mean'], reverse=True)
-    print("*" * 100)
-    for index, obj in enumerate(sort_list):
-        print(obj)
-        if index != 0:
-            shutil.rmtree(obj['checkpoint_path'])
-
     best_obj = sort_list[0]
     best_checkpoint_path = best_obj.get("checkpoint_path")
-    best_agent = get_trainer()
-    best_agent.restore(checkpoint_path=best_checkpoint_path)
+    trainer = get_trainer()
+    trainer.restore(checkpoint_path=best_checkpoint_path)
 
-    # test
+    # ====================删除模型=====================
+    for index, obj in enumerate(sort_list):
+        shutil.rmtree(obj['checkpoint_path'])
+
     env = ENV_CLASS()
+    # ====================测试=====================
     for i in range(10):
         episode_reward = 0
         done = False
         obs = env.reset()
         while not done:
-            action = best_agent.compute_single_action(obs)
+            action = trainer.compute_single_action(obs)
+            obs, reward, done, info = env.step(action)
+            episode_reward += reward
+
+        print(f"NO.{i},episode_reward={episode_reward}")
+
+    # ====================挑出最好的再训练=====================
+    trainer.train()
+    tmp2_list = []
+    for episode_index in range(10):
+        trainer_result = trainer.train()
+        episode_reward_max = trainer_result['episode_reward_max']
+        episode_reward_min = trainer_result['episode_reward_min']
+        episode_reward_mean = trainer_result['episode_reward_mean']
+        # 保存模型
+        checkpoint_path = trainer.save(checkpoint_dir)
+        tmp2_obj = {
+            "train_index": train_index,
+            "episode_index": episode_index,
+            "episode_reward_max": episode_reward_max,
+            "episode_reward_min": episode_reward_min,
+            "episode_reward_mean": episode_reward_mean,
+            "checkpoint_path": checkpoint_path
+        }
+        print(tmp2_obj)
+        tmp2_list.append(tmp2_obj)
+    trainer.stop()
+
+    sort2_list = sorted(tmp2_list, key=lambda item: item['episode_reward_mean'], reverse=True)
+    best2_obj = sort2_list[0]
+    best2_checkpoint_path = best2_obj.get("checkpoint_path")
+    trainer = get_trainer()
+    trainer.restore(checkpoint_path=best2_checkpoint_path)
+
+    # ====================删除模型=====================
+    for index, obj in enumerate(sort2_list):
+        shutil.rmtree(obj['checkpoint_path'])
+
+    # ====================测试=====================
+    for i in range(10):
+        episode_reward = 0
+        done = False
+        obs = env.reset()
+        while not done:
+            action = trainer.compute_single_action(obs)
             obs, reward, done, info = env.step(action)
             episode_reward += reward
 
