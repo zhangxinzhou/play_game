@@ -51,6 +51,9 @@ while switch:
     if pause:
         continue
 
+    # 鼠标移动到某个不影响图片判断的位置
+    script_utils.back_position()
+
     # 是否有遮罩层
     click_able = script_utils.click_able()
     if not click_able:

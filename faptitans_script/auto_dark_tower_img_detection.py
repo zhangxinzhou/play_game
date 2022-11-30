@@ -10,7 +10,7 @@ pyautogui.FAILSAFE = False
 # 延迟设置
 pyautogui.PAUSE = 0.0001
 
-confidence = 0.95   
+confidence = 0.95
 tower_in = "detection_img/tower_in.png"
 tower_go = "detection_img/tower_go.png"
 tower_relic = "detection_img/tower_relic.png"
@@ -37,6 +37,9 @@ count = 0
 while switch:
     print(datetime.now())
     time.sleep(1)
+
+    # 鼠标移动到某个不影响图片判断的位置
+    script_utils.back_position()
 
     # 是否有遮罩层
     click_able = script_utils.click_able()

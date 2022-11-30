@@ -35,6 +35,9 @@ while switch:
     print(datetime.now())
     time.sleep(1)
 
+    # 鼠标移动到某个不影响图片判断的位置
+    script_utils.back_position()
+
     # 错误
     click_result = script_utils.click_img(img_path=error)
     if click_result:

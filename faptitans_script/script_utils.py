@@ -6,16 +6,22 @@ PROMPT_PATH = "detection_img"
 
 
 # 点击图片
-def click_img(img_path, confidence=0.95, last_location_x=100, last_location_y=100):
+def click_img(img_path, confidence=0.95):
     is_click = False
     location = pyautogui.locateOnScreen(image=img_path, confidence=confidence)
     if location is not None:
         x, y = pyautogui.center(location)
         pyautogui.leftClick(x, y)
-        pyautogui.moveTo(x=last_location_x, y=last_location_y)
         is_click = True
     # 移动到某个位置,防止阻挡图层
     return is_click
+
+
+# 返回某个位置，不影响图片判断
+def back_position(last_location_x=100, last_location_y=100):
+    x, y = pyautogui.position()
+    if x != last_location_x or y != last_location_y:
+        pyautogui.moveTo(x=last_location_x, y=last_location_y)
 
 
 # 判断是否有遮罩层

@@ -52,6 +52,9 @@ while switch:
     if pause:
         continue
 
+    # 鼠标移动到某个不影响图片判断的位置
+    script_utils.back_position()
+
     # 是否有遮罩层
     click_able = script_utils.click_able()
     if not click_able:
@@ -80,25 +83,3 @@ while switch:
             # 处理boss再现
             script_utils.click_img(img_path=boss)
             continue
-        elif sk04_location is not None and sk01_location is not None:
-            # 如果技能4ok,技能1不ok,则等待技能(什么都不做)
-            pass
-        elif sk01_location is not None:
-            # 如果技能1ok,则点击技能1
-            x, y = pyautogui.center(sk01_location)
-            pyautogui.leftClick(x, y)
-            # 处理boss再现
-            script_utils.click_img(img_path=boss)
-            continue
-
-        # 英雄升级
-        click_result = script_utils.click_img(img_path=hero_lv_up)
-        if click_result:
-            continue
-
-        # 点击小怪
-        # minion_location = pyautogui.locateOnScreen(image=minion, confidence=0.9)
-        # if minion_location is not None:
-        #     x, y = pyautogui.center(minion_location)
-        #     pyautogui.leftClick(x - 50, y)
-        #     pyautogui.moveTo(x=100, y=100)
