@@ -15,7 +15,6 @@ boss = "detection_img/boss.png"
 minion = "detection_img/minion.png"
 skill_01 = "detection_img/skill_01.png"
 skill_04 = "detection_img/skill_04.png"
-to_underworld = "detection_img/to_underworld.png"
 skill_interval_y_axis = 70
 
 # 开关,控制,如果监听到esc按键被按下,整个程序就会停止
@@ -58,11 +57,6 @@ while switch:
         # 关闭弹窗
         script_utils.close_prompt()
     else:
-        # 先切换到under world
-        click_result = script_utils.click_img(img_path=to_underworld)
-        if click_result:
-            continue
-
         # 先处理技能
         sk01_location = pyautogui.locateOnScreen(image=skill_01)
         sk04_location = pyautogui.locateOnScreen(image=skill_04)
@@ -97,8 +91,8 @@ while switch:
             continue
 
         # 点击小怪
-        # minion_location = pyautogui.locateOnScreen(image=minion, confidence=0.9)
-        # if minion_location is not None:
-        #     x, y = pyautogui.center(minion_location)
-        #     pyautogui.leftClick(x - 50, y)
-        #     pyautogui.moveTo(x=100, y=100)
+        minion_location = pyautogui.locateOnScreen(image=minion, confidence=0.9)
+        if minion_location is not None:
+            x, y = pyautogui.center(minion_location)
+            pyautogui.leftClick(x - 50, y)
+            pyautogui.moveTo(x=100, y=100)
