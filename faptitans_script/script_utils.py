@@ -6,11 +6,15 @@ PROMPT_PATH = "detection_img"
 
 
 # 点击图片
-def click_img(img_path, confidence=0.95):
+def click_img(img_path, confidence=0.95, offset=(0, 0)):
     is_click = False
     location = pyautogui.locateOnScreen(image=img_path, confidence=confidence)
     if location is not None:
         x, y = pyautogui.center(location)
+        x_offset = offset[0]
+        y_offset = offset[1]
+        x = x + x_offset
+        y = y + y_offset
         pyautogui.leftClick(x, y)
         is_click = True
     # 移动到某个位置,防止阻挡图层

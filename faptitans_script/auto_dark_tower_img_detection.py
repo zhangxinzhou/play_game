@@ -13,6 +13,8 @@ pyautogui.PAUSE = 0.0001
 confidence = 0.95
 tower_in = "detection_img/tower_in.png"
 tower_go = "detection_img/tower_go.png"
+tower_heart_1 = "detection_img/tower_heart_1.png"
+tower_heart_2 = "detection_img/tower_heart_2.png"
 tower_relic = "detection_img/tower_relic.png"
 tower_add_time = "detection_img/tower_add_time.png"
 skill_01 = "detection_img/skill_01.png"
@@ -33,6 +35,7 @@ def on_press(key):
 listener = keyboard.Listener(on_press=on_press)
 listener.start()
 
+time.sleep(3)
 count = 0
 while switch:
     print(datetime.now())
@@ -57,8 +60,10 @@ while switch:
         # 关闭弹窗
         script_utils.close_prompt()
     else:
-        # 点击go
-        click_result = script_utils.click_img(img_path=tower_go)
+        # 点击go or 点击红心上方
+        click_result = script_utils.click_img(img_path=tower_go) \
+                       or script_utils.click_img(img_path=tower_heart_1, offset=(0, -30)) \
+                       or script_utils.click_img(img_path=tower_heart_2, offset=(0, -30))
         if click_result and count < 10:
             count += 1
             continue
