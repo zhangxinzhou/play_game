@@ -2,6 +2,10 @@ import os
 import pyautogui
 
 MASK_LAYER_PATH = "detection_img/mask_layer.png"
+HERO_SCROLL = "detection_img/hero_scroll.png"
+HERO_SCROLL_START = "detection_img/hero_scroll_start.png"
+HERO_SCROLL_END = "detection_img/hero_scroll_end.png"
+HERO_SCROLL_IS_TOP = False
 PROMPT_PATH = "detection_img"
 
 
@@ -56,6 +60,25 @@ def close_prompt():
         if click_result:
             return click_result
     return False
+
+
+#
+def hero_scroll(val):
+    global HERO_SCROLL_IS_TOP
+    hero_scroll_start_location = pyautogui.locateOnScreen(image=HERO_SCROLL_START)
+    hero_scroll_end_location = pyautogui.locateOnScreen(image=HERO_SCROLL_END)
+    if hero_scroll_start_location is not None:
+        HERO_SCROLL_IS_TOP = True
+    elif hero_scroll_end_location is not None:
+        HERO_SCROLL_IS_TOP = False
+    hero_scroll_location = pyautogui.locateOnScreen(image=HERO_SCROLL)
+    if hero_scroll_location is None:
+        return
+    x, y = pyautogui.center(hero_scroll_location)
+    pyautogui.moveTo(x=x, y=y)
+    if HERO_SCROLL_IS_TOP:
+        val = -1 * val
+    pyautogui.scroll(val)
 
 
 if __name__ == '__main__':
