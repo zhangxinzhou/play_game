@@ -11,6 +11,7 @@ pyautogui.FAILSAFE = False
 pyautogui.PAUSE = 0.0001
 
 hero_lv_up = "detection_img/hero_lv_up.png"
+hero_x25 = "detection_img/hero_lv_up_25.png"
 boss = "detection_img/boss.png"
 minion = "detection_img/minion.png"
 skill_01 = "detection_img/skill_01.png"
@@ -89,6 +90,7 @@ while switch:
             continue
 
         # 英雄升级
+        script_utils.click_img(hero_x25)
         click_result = script_utils.click_img(img_path=hero_lv_up)
         if click_result:
             continue
