@@ -55,6 +55,7 @@ while switch:
         # 打开箱子
         click_result = script_utils.click_img(img_path=tower_relic)
         if click_result:
+            time.sleep(1)
             continue
 
         # 关闭弹窗

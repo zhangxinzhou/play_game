@@ -37,7 +37,8 @@ def click_able():
     location = pyautogui.locateOnScreen(image=MASK_LAYER_PATH, confidence=0.95)
     if location is not None:
         x, y = pyautogui.center(location)
-        return pyautogui.pixelMatchesColor(int(x), int(y), (255, 87, 87))
+        print(pyautogui.pixel(int(x), int(y)))
+        return pyautogui.pixelMatchesColor(int(x), int(y), (255, 84, 84))
     return False
 
 

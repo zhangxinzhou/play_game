@@ -57,6 +57,7 @@ while switch:
 
     # 是否有遮罩层
     click_able = script_utils.click_able()
+    print(click_able)
     if not click_able:
         # 关闭弹窗
         script_utils.close_prompt()
